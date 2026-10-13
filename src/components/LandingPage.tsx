@@ -317,7 +317,15 @@ function Header() {
 
 /* ---------------------- HERO ---------------------- */
 
-function HeroFlight({ className = "", parallax = false }: { className?: string; parallax?: boolean }) {
+function HeroFlight({
+  className = "",
+  parallax = false,
+  mobile = false,
+}: {
+  className?: string;
+  parallax?: boolean;
+  mobile?: boolean;
+}) {
   const reduce = useReducedMotion();
   const uid = useId().replace(/:/g, "");
   const pathRef = useRef<SVGPathElement>(null);
@@ -362,7 +370,11 @@ function HeroFlight({ className = "", parallax = false }: { className?: string; 
       style={parallax && !reduce ? { y: drift } : undefined}
       className={`pointer-events-none ${className}`}
     >
-      <svg viewBox="0 0 640 560" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <svg
+        viewBox={mobile ? "80 120 470 290" : "0 0 640 560"}
+        className={mobile ? "absolute inset-0 h-full w-full" : "h-full w-full"}
+        preserveAspectRatio="xMidYMid meet"
+      >
         <defs>
           <linearGradient id={`${uid}-route`} x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#0f2a26" stopOpacity="0.25" />
@@ -393,7 +405,7 @@ function HeroFlight({ className = "", parallax = false }: { className?: string; 
           ref={pathRef}
           d="M140 340 C240 140 400 120 480 200"
           stroke={`url(#${uid}-route)`}
-          strokeWidth="2.4"
+          strokeWidth={mobile ? 3.4 : 2.4}
           fill="none"
           strokeLinecap="round"
           initial={reduce ? false : { pathLength: 0 }}
@@ -411,7 +423,7 @@ function HeroFlight({ className = "", parallax = false }: { className?: string; 
         />
 
         <g ref={planeRef}>
-          <g transform="translate(-11,-11)">
+          <g transform={`scale(${mobile ? 1.8 : 1}) translate(-11,-11)`}>
             <path
               d="M1 9 8 7 14 1 16 2 14 8 22 12 22 14 13 13 9 21 7 21 8 13 1 13Z"
               fill="#0f2a26"
@@ -427,11 +439,11 @@ function HeroFlight({ className = "", parallax = false }: { className?: string; 
           r="16"
           fill="#0f2a26"
           fillOpacity="0.08"
-          animate={reduce ? undefined : { r: [11, 20, 11] }}
+          animate={reduce ? undefined : { r: mobile ? [14, 28, 14] : [11, 20, 11] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
         />
-        <circle cx="140" cy="340" r="5.5" fill="#0f2a26" />
-        <circle cx="140" cy="340" r="2.2" fill="#f7f9f8" />
+        <circle cx="140" cy="340" r={mobile ? 8 : 5.5} fill="#0f2a26" />
+        <circle cx="140" cy="340" r={mobile ? 3.2 : 2.2} fill="#f7f9f8" />
 
         <motion.circle
           cx="480"
@@ -439,16 +451,16 @@ function HeroFlight({ className = "", parallax = false }: { className?: string; 
           r="16"
           fill="#d4a853"
           fillOpacity="0.14"
-          animate={reduce ? undefined : { r: [11, 20, 11] }}
+          animate={reduce ? undefined : { r: mobile ? [14, 28, 14] : [11, 20, 11] }}
           transition={{ duration: 2.8, delay: 1.3, repeat: Infinity, ease: "easeInOut" }}
         />
-        <circle cx="480" cy="200" r="5.5" fill="#d4a853" />
-        <circle cx="480" cy="200" r="2.2" fill="#f7f9f8" />
+        <circle cx="480" cy="200" r={mobile ? 8 : 5.5} fill="#d4a853" />
+        <circle cx="480" cy="200" r={mobile ? 3.2 : 2.2} fill="#f7f9f8" />
 
-        <text x="108" y="380" fontSize="13" fontWeight="600" fill="#0f2a26" opacity="0.65">
+        <text x={mobile ? 140 : 108} y={mobile ? 396 : 380} textAnchor={mobile ? "middle" : "start"} fontSize={mobile ? 21 : 13} fontWeight="600" fill="#0f2a26" opacity="0.65">
           India
         </text>
-        <text x="445" y="235" fontSize="13" fontWeight="600" fill="#0f2a26" opacity="0.65">
+        <text x={mobile ? 480 : 445} y={mobile ? 254 : 235} textAnchor={mobile ? "middle" : "start"} fontSize={mobile ? 21 : 13} fontWeight="600" fill="#0f2a26" opacity="0.65">
           United States
         </text>
       </svg>
@@ -472,19 +484,19 @@ function Hero() {
         className="absolute inset-y-0 right-0 hidden w-[52%] lg:block"
       />
 
-      <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col justify-start px-4 py-4 sm:px-6 sm:py-8 lg:justify-center lg:px-8">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease }}
-          className="relative z-10 max-w-xl lg:max-w-[48%]"
+          className="relative z-10 my-auto max-w-xl lg:my-0 lg:max-w-[48%]"
         >
           <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#d4a853]/40 bg-[#d4a853]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#6b5214]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#d4a853]" />
             India-based, for Indian investors
           </p>
 
-          <h1 className="text-balance text-[2.4rem] font-semibold leading-[1.05] tracking-tight text-[#0f2a26] sm:text-[3.4rem] lg:text-[3.9rem] xl:text-[4.4rem]">
+          <h1 className="text-balance text-[2.1rem] font-semibold leading-[1.05] tracking-tight text-[#0f2a26] sm:text-[3.4rem] lg:text-[3.9rem] xl:text-[4.4rem]">
             Clear process support for your{" "}
             <span className="relative inline-block whitespace-nowrap">
               <span className="relative z-10">EB-5 journey</span>
@@ -521,13 +533,17 @@ function Hero() {
             </a>
           </div>
 
-          <p className="mt-6 flex items-center gap-2 text-[13px] text-[#4a5c57]">
+          <p className="mt-6 hidden items-center gap-2 text-[13px] text-[#4a5c57] sm:flex">
             <ShieldCheck size={16} className="shrink-0 text-[#0f2a26]" strokeWidth={1.7} aria-hidden />
             No guaranteed outcomes. Every case is different.
           </p>
         </motion.div>
 
-        <HeroFlight className="relative mx-auto mt-4 h-40 w-full max-w-sm sm:h-56 lg:hidden" />
+        {/* Phones and tablets: full-width flight anchored at the bottom of the hero */}
+        <HeroFlight
+          mobile
+          className="relative -mx-4 mt-4 h-[180px] shrink-0 min-[400px]:h-[200px] sm:-mx-6 sm:h-[240px] lg:hidden [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_16%)] [mask-image:linear-gradient(to_bottom,transparent,black_16%)]"
+        />
       </div>
 
       {!reduce && (
