@@ -8,51 +8,50 @@ export const navItems = [
   ["FAQ", "#faq"],
 ] as const;
 
-export const aboutIntro =
-  "Local support and specialist lawyers who work with Indian investors every day.";
+export const aboutLead =
+  "We deliver specialized legal process outsourcing services to U.S. immigration law firms handling EB-5 investor visas, H-1B employment-based petitions, and L-1 intra-company transfer cases.";
 
-export const aboutRoles = [
-  { icon: "Layers", title: "We organise", text: "Documents, milestones and follow-ups." },
-  { icon: "Scale", title: "Lawyers advise", text: "India-based EB-5 specialists." },
-  { icon: "ShieldCheck", title: "You decide", text: "Every choice stays yours." },
+export const aboutBlocks = [
+  {
+    title: "Our expertise",
+    text: "Our team combines deep expertise in immigration law with meticulous attention to petition preparation, documentation management, and regulatory compliance.",
+  },
+  {
+    title: "How we partner",
+    text: "We partner with law firms to streamline back-office workflows, reduce operational costs, and accelerate case processing – enabling attorneys to focus on client relationships and strategic counsel.",
+  },
 ] as const;
 
-export const aboutPoints = [
-  {
-    icon: "MapPin",
-    title: "Based in India",
-    text: "A team that understands Indian banking, documents and timelines.",
-  },
-  {
-    icon: "MessageCircle",
-    title: "Plain communication",
-    text: "Clear scope, fees in writing and straight answers.",
-  },
-  {
-    icon: "Clock",
-    title: "Your pace",
-    text: "Start with a conversation, not documents. No pressure to decide.",
-  },
+export const aboutPillars = [
+  { icon: "Check", label: "Accuracy" },
+  { icon: "ShieldCheck", label: "Integrity" },
+  { icon: "Lock", label: "Confidentiality" },
 ] as const;
 
 export const services = [
   {
-    icon: "FolderOpen",
-    title: "Process coordination",
-    text: "Track milestones, documents and follow-ups across your EB-5 journey.",
-    detail: ["Milestone tracking", "Document coordination", "Follow-ups"],
+    title: "Immigration LPO Services",
+    text: "Specialized legal process outsourcing services for U.S. immigration law firms.",
   },
   {
-    icon: "Users",
-    title: "Indian EB-5 lawyers",
-    text: "Work with India-based lawyers who specialise in EB-5 for Indian investors.",
-    detail: ["Specialist lawyers", "Case review", "Clear scope"],
+    title: "EB-5 Visa Expertise",
+    text: "Deep expertise in EB-5 investor visas, including Source of Funds and Path of Funds analysis.",
   },
   {
-    icon: "FileText",
-    title: "Document organisation",
-    text: "Structure the records Indian investors need for source of funds.",
-    detail: ["Checklists", "Record organisation", "Outstanding items"],
+    title: "End-to-End Petition Support",
+    text: "Complete I-526E petition package preparation, including I-485 and DS-260 applications.",
+  },
+  {
+    title: "Compliance & Documentation",
+    text: "Meticulous petition preparation, documentation management, regulatory compliance, and complex RFE and NOID responses.",
+  },
+  {
+    title: "Operational Efficiency",
+    text: "Streamlined back-office workflows that reduce operational costs and accelerate case processing.",
+  },
+  {
+    title: "Attorney Focus Enablement",
+    text: "Enables attorneys to focus on client relationships and strategic counsel.",
   },
 ] as const;
 

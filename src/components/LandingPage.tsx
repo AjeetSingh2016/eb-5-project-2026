@@ -29,14 +29,8 @@ import {
   ShieldCheck,
   X,
   FileText,
-  Users,
-  FolderOpen,
   Quote,
-  MapPin,
-  Scale,
   MessageCircle,
-  Layers,
-  Clock,
   Lock,
   RefreshCw,
   Send,
@@ -51,16 +45,15 @@ import {
   questionsWorthAsking,
   faqs,
   testimonials,
-  aboutIntro,
-  aboutPoints,
-  aboutRoles,
+  aboutLead,
+  aboutBlocks,
+  aboutPillars,
   engagementIntro,
   engagementSteps,
   feesNote,
   feeModels,
 } from "@/data/content";
 
-const iconMap = { FolderOpen, Users, FileText } as const;
 
 /* ---------- Tokens ---------- */
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -586,8 +579,7 @@ function Hero() {
 
 /* ---------------------- ABOUT ---------------------- */
 
-const aboutIconMap = { MapPin, MessageCircle, Clock } as const;
-const roleIconMap = { Layers, Scale, ShieldCheck } as const;
+const pillarIconMap = { Check, ShieldCheck, Lock } as const;
 
 function About() {
   const reduce = useReducedMotion();
@@ -595,57 +587,46 @@ function About() {
   return (
     <Section id="about" className="bg-[#041e3f]" dark>
       <Reveal>
-        <SectionHeading light tag="About us" description={aboutIntro}>
-          Based in India, built for Indian investors
+        <SectionHeading light tag="About us">
+          A Trusted Partner in Immigration Operations
         </SectionHeading>
       </Reveal>
 
-      {/* Who does what: three roles joined by arrows */}
-      <Reveal className="mb-5">
-        <div className="grid divide-y divide-white/10 rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-sm md:grid-cols-3 md:divide-x md:divide-y-0">
-          {aboutRoles.map((role, i) => {
-            const Icon = roleIconMap[role.icon];
-            return (
-              <div key={role.title} className="relative flex flex-col items-center px-6 py-8 text-center sm:py-10">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#d4a853]/10 text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
-                  <Icon size={22} strokeWidth={1.6} aria-hidden />
-                </span>
-                <h3 className="mt-5 text-[1.4rem] font-semibold tracking-tight text-white sm:text-[1.6rem]">
-                  {role.title}
-                </h3>
-                <p className="mt-1.5 text-[15px] leading-6 text-white/65">{role.text}</p>
-                {i < aboutRoles.length - 1 && (
-                  <span
-                    aria-hidden
-                    className="absolute right-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/15 bg-[#041e3f] text-[#e3bd6a] md:flex"
-                  >
-                    <ArrowRight size={14} />
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+      <Reveal className="mx-auto mb-5 max-w-3xl">
+        <p className="text-balance text-center text-[1.05rem] leading-8 text-white/90 sm:text-[1.25rem] sm:leading-9">
+          {aboutLead}
+        </p>
       </Reveal>
 
-      <div className="grid gap-4 md:grid-cols-3 md:gap-5">
-        {aboutPoints.map((point, i) => {
-          const Icon = aboutIconMap[point.icon];
+      <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2 md:gap-5">
+        {aboutBlocks.map((block, i) => (
+          <Reveal key={block.title} delay={i * 0.1} className="h-full">
+            <motion.div
+              whileHover={reduce ? undefined : { y: -4 }}
+              transition={{ duration: 0.3 }}
+              className="h-full rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition-[border-color,background-color] hover:border-[#d4a853]/40 hover:bg-white/[0.07] sm:p-8"
+            >
+              <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">{block.title}</h3>
+              <p className="mt-2 text-[15px] leading-7 text-white/70">{block.text}</p>
+            </motion.div>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal delay={0.2} className="mt-8 flex flex-wrap justify-center gap-3">
+        {aboutPillars.map((pillar) => {
+          const Icon = pillarIconMap[pillar.icon];
           return (
-            <Reveal key={point.title} delay={i * 0.09} className="h-full">
-              <motion.div
-                whileHover={reduce ? undefined : { y: -5 }}
-                transition={{ duration: 0.3 }}
-                className="flex h-full flex-col items-center rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center backdrop-blur-sm transition hover:border-[#d4a853]/40 hover:bg-white/[0.07] lg:p-8"
-              >
-                <Icon size={22} strokeWidth={1.6} className="text-[#e3bd6a]" aria-hidden />
-                <h3 className="mt-4 text-[1.15rem] font-semibold tracking-tight text-white">{point.title}</h3>
-                <p className="mt-2 text-[15px] leading-7 text-white/70">{point.text}</p>
-              </motion.div>
-            </Reveal>
+            <span
+              key={pillar.label}
+              className="inline-flex items-center gap-2 rounded-full border border-[#d4a853]/30 bg-[#d4a853]/10 px-4 py-2 text-[14px] font-medium text-white"
+            >
+              <Icon size={15} strokeWidth={1.8} className="text-[#e3bd6a]" aria-hidden />
+              {pillar.label}
+            </span>
           );
         })}
-      </div>
+      </Reveal>
     </Section>
   );
 }
@@ -660,50 +641,35 @@ function Services() {
       <Reveal>
         <SectionHeading
           light
-          tag="What we do"
-          description="Organised support from India, with EB-5 specialist lawyers by your side."
+          tag="Services"
+          description="Specialized legal process outsourcing for U.S. immigration law firms."
         >
-          Practical support at every stage
+          What we do for your practice
         </SectionHeading>
       </Reveal>
 
-      <div className="grid gap-5 md:grid-cols-3">
-        {services.map((service, i) => {
-          const Icon = iconMap[service.icon];
-          return (
-            <Reveal key={service.title} delay={i * 0.09} className="h-full">
-              <motion.article
-                whileHover={reduce ? undefined : { y: -6 }}
-                transition={{ duration: 0.3 }}
-                className="group relative flex h-full flex-col items-center overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center backdrop-blur-sm transition-[border-color,background-color] hover:border-[#d4a853]/40 hover:bg-white/[0.07] lg:p-8"
-              >
-                <span
-                  aria-hidden
-                  className="absolute inset-x-8 top-0 h-px origin-center scale-x-0 bg-gradient-to-r from-transparent via-[#d4a853] to-transparent transition-transform duration-500 group-hover:scale-x-100"
-                />
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#d4a853]/10 text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
-                  <Icon size={24} strokeWidth={1.6} aria-hidden />
-                </div>
-                <h3 className="mt-6 text-[1.3rem] font-semibold tracking-tight text-white">
-                  {service.title}
-                </h3>
-                <p className="mt-2 flex-1 text-[15px] leading-7 text-white/70">
-                  {service.text}
-                </p>
-                <ul className="mt-6 flex flex-wrap justify-center gap-2">
-                  {service.detail.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1 text-[12px] text-white/80"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.article>
-            </Reveal>
-          );
-        })}
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+        {services.map((service, i) => (
+          <Reveal key={service.title} delay={(i % 3) * 0.08} className="h-full">
+            <motion.article
+              whileHover={reduce ? undefined : { y: -5 }}
+              transition={{ duration: 0.3 }}
+              className="group relative flex h-full flex-col items-center overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center backdrop-blur-sm transition-[border-color,background-color] hover:border-[#d4a853]/40 hover:bg-white/[0.07] lg:p-7"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-x-8 top-0 h-px origin-center scale-x-0 bg-gradient-to-r from-transparent via-[#d4a853] to-transparent transition-transform duration-500 group-hover:scale-x-100"
+              />
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#d4a853]/10 text-[15px] font-semibold tabular-nums text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 className="mt-5 text-[1.2rem] font-semibold tracking-tight text-white">
+                {service.title}
+              </h3>
+              <p className="mt-2 text-[15px] leading-7 text-white/70">{service.text}</p>
+            </motion.article>
+          </Reveal>
+        ))}
       </div>
     </Section>
   );
