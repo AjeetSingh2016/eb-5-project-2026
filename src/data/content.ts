@@ -1,6 +1,7 @@
 export const navItems = [
   ["Services", "#services"],
-  ["Process", "#process"],
+  ["Engagement", "#engagement"],
+  ["Fees", "#fees"],
   ["Funds", "#funds"],
   ["Stories", "#testimonials"],
   ["About", "#about"],
@@ -55,25 +56,6 @@ export const services = [
   },
 ] as const;
 
-export const steps = [
-  {
-    title: "Conversation",
-    text: "Share your goals and timeline. No documents yet.",
-  },
-  {
-    title: "Landscape",
-    text: "Get an overview and meet your EB-5 specialist lawyer.",
-  },
-  {
-    title: "Next steps",
-    text: "Build a practical checklist for Indian investors.",
-  },
-  {
-    title: "Follow-up",
-    text: "We track requests. The decisions stay with you.",
-  },
-] as const;
-
 export const fundItems = [
   { title: "Origin", text: "Where was the capital earned?" },
   { title: "Evidence", text: "Which records prove the source?" },
@@ -97,6 +79,10 @@ export const faqs = [
   {
     q: "Who are the lawyers?",
     a: "India-based lawyers who specialise in EB-5 for Indian investors. Scope and fees are confirmed in writing before you engage anyone.",
+  },
+  {
+    q: "How are fees structured?",
+    a: "Flexibly. You can work per project or on a retainer. Scope, timelines and fees are agreed in writing before any work begins.",
   },
   {
     q: "Does investing guarantee a Green Card?",
@@ -134,5 +120,58 @@ export const testimonials = [
     quote: "Organising bank statements and records for source of funds felt manageable instead of overwhelming.",
     name: "P. M.",
     place: "Delhi",
+  },
+] as const;
+
+export const engagementIntro = "A streamlined, professional workflow built for law firms.";
+
+export const engagementSteps = [
+  {
+    icon: "MessageCircle",
+    title: "Initial Consultation",
+    text: "Discuss your practice needs, volume, preferred formats and deadlines.",
+  },
+  {
+    icon: "Lock",
+    title: "Secure Document Sharing",
+    text: "You provide client data, past filings and specifications through encrypted channels.",
+  },
+  {
+    icon: "FileText",
+    title: "Drafting & Preparation",
+    text: "Our team prepares drafts, forms, research notes or full petition packets as requested.",
+  },
+  {
+    icon: "RefreshCw",
+    title: "Review & Revision",
+    text: "You review and give feedback, and we make precise adjustments to meet your standards.",
+  },
+  {
+    icon: "Send",
+    title: "Final Delivery",
+    text: "We deliver polished, submission-ready documents within agreed timelines.",
+  },
+  {
+    icon: "Repeat",
+    title: "Ongoing Support",
+    text: "Flexible retainer or per-project models for continuous collaboration.",
+  },
+] as const;
+
+export const feesNote =
+  "Scope, timelines and fees are agreed in writing before any work begins.";
+
+export const feeModels = [
+  {
+    icon: "Briefcase",
+    title: "Per-project",
+    text: "A defined scope and price for a single filing, petition packet or research task.",
+    bullets: ["Single filing or packet", "Defined scope", "Agreed timeline"],
+  },
+  {
+    icon: "Repeat",
+    title: "Flexible retainer",
+    text: "Ongoing capacity for steady volume, with terms that fit your caseload.",
+    bullets: ["Steady volume", "Continuous collaboration", "Flexible terms"],
   },
 ] as const;

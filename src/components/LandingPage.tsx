@@ -18,6 +18,7 @@ import {
   useTransform,
   AnimatePresence,
 } from "framer-motion";
+import Image from "next/image";
 import {
   ArrowDown,
   ArrowRight,
@@ -36,12 +37,16 @@ import {
   MessageCircle,
   Layers,
   Clock,
+  Lock,
+  RefreshCw,
+  Send,
+  Repeat,
+  Briefcase,
 } from "lucide-react";
 
 import {
   navItems,
   services,
-  steps,
   fundItems,
   questionsWorthAsking,
   faqs,
@@ -49,6 +54,10 @@ import {
   aboutIntro,
   aboutPoints,
   aboutRoles,
+  engagementIntro,
+  engagementSteps,
+  feesNote,
+  feeModels,
 } from "@/data/content";
 
 const iconMap = { FolderOpen, Users, FileText } as const;
@@ -114,7 +123,7 @@ function SectionHeading({
       )}
       <h2
         className={`text-balance text-[2rem] font-semibold leading-[1.1] tracking-tight sm:text-[2.8rem] lg:text-[3.2rem] xl:text-[3.5rem] ${
-          light ? "text-white" : "text-[#0f2a26]"
+          light ? "text-white" : "text-[#041e3f]"
         }`}
       >
         {children}
@@ -122,7 +131,7 @@ function SectionHeading({
       {description && (
         <p
           className={`mx-auto mt-4 max-w-lg text-[15px] leading-7 sm:text-[17px] sm:leading-8 ${
-            light ? "text-white/70" : "text-[#4a5c57]"
+            light ? "text-white/70" : "text-[#4a5a70]"
           }`}
         >
           {description}
@@ -144,7 +153,7 @@ function Section({
   dark?: boolean;
   children: ReactNode;
 }) {
-  const dot = dark ? "rgba(255,255,255,0.08)" : "rgba(15,42,38,0.10)";
+  const dot = dark ? "rgba(255,255,255,0.08)" : "rgba(4,30,63,0.10)";
   const mask = "radial-gradient(ellipse 75% 65% at 50% 40%, #000 25%, transparent 75%)";
   return (
     <section
@@ -194,7 +203,7 @@ function Header() {
   }, [open]);
 
   useEffect(() => {
-    const ids = ["top", "about", "services", "process", "funds", "testimonials", "faq", "consult"];
+    const ids = ["top", "about", "services", "engagement", "fees", "funds", "testimonials", "faq", "consult"];
     const elements = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -220,34 +229,47 @@ function Header() {
       <div
         className={`relative mx-auto flex h-12 max-w-[1100px] items-center justify-between rounded-2xl border pl-3 pr-1.5 transition-all duration-500 sm:h-[52px] sm:pl-4 lg:pr-2 xl:max-w-[1200px] ${
           scrolled || open
-            ? "border-[#d9e2de] bg-white/85 shadow-[0_12px_40px_-14px_rgba(15,42,38,0.22)] backdrop-blur-xl"
+            ? "border-[#d8e1ec] bg-white/85 shadow-[0_12px_40px_-14px_rgba(4,30,63,0.22)] backdrop-blur-xl"
             : "border-white/70 bg-white/55 shadow-[0_1px_0_rgba(255,255,255,0.6)_inset] backdrop-blur-md"
         }`}
       >
-        <a href="#top" className={`group flex items-center gap-2.5 rounded-lg ${focusRing}`}>
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0f2a26] text-white shadow-md shadow-[#0f2a26]/20 transition group-hover:scale-105">
-            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
-              <path d="M3 17L8 7l5 7 4-6 4 9" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M3 20h18" stroke="#d4a853" strokeWidth="1.8" />
-            </svg>
+        <a
+          href="#top"
+          aria-label="Paralegal — Your path, Our purpose"
+          className={`group flex min-w-0 items-center gap-2.5 rounded-lg ${focusRing}`}
+        >
+          <Image
+            src="/logo.png"
+            alt=""
+            width={48}
+            height={60}
+            priority
+            className="h-10 w-auto shrink-0 object-contain sm:h-11"
+          />
+          <span className="flex min-w-0 flex-col justify-center">
+            <span className="text-[15px] font-semibold leading-tight tracking-tight text-[#041e3f]">
+              Paralegal
+            </span>
+            <span className="mt-0.5 truncate text-[10px] font-medium leading-tight tracking-wide text-[#5f6f85] sm:text-[11px]">
+              Your path, Our purpose
+            </span>
           </span>
-          <span className="text-[15px] font-semibold tracking-tight text-[#0f2a26]">Lawyers on Call</span>
         </a>
 
-        <nav aria-label="Primary" className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+        <nav aria-label="Primary" className="hidden flex-1 items-center justify-center gap-0.5 lg:flex xl:gap-1">
           {navItems.map(([label, href]) => (
             <a
               key={href}
               href={href}
               aria-current={active === href ? "true" : undefined}
-              className={`relative rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${focusRing} ${
-                active === href ? "text-[#0f2a26]" : "text-[#4a5c57] hover:text-[#0f2a26]"
+              className={`relative rounded-full px-3 py-1.5 text-[13px] xl:px-3.5 font-medium transition-colors ${focusRing} ${
+                active === href ? "text-[#041e3f]" : "text-[#4a5a70] hover:text-[#041e3f]"
               }`}
             >
               {active === href && (
                 <motion.span
                   layoutId="nav-pill"
-                  className="absolute inset-0 rounded-full bg-[#0f2a26]/[0.07]"
+                  className="absolute inset-0 rounded-full bg-[#041e3f]/[0.07]"
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}
@@ -258,7 +280,7 @@ function Header() {
 
         <a
           href="#consult"
-          className={`hidden items-center gap-1.5 rounded-xl bg-[#0f2a26] px-4 py-2 text-[13px] font-semibold text-white shadow-md shadow-[#0f2a26]/20 transition hover:bg-[#163832] lg:inline-flex ${focusRing}`}
+          className={`hidden items-center gap-1.5 rounded-xl bg-[#041e3f] px-4 py-2 text-[13px] font-semibold text-white shadow-md shadow-[#041e3f]/20 transition hover:bg-[#0b2c57] lg:inline-flex ${focusRing}`}
         >
           Start a conversation
           <ArrowUpRight size={14} aria-hidden />
@@ -270,7 +292,7 @@ function Header() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          className={`flex h-10 w-10 items-center justify-center rounded-xl text-[#0f2a26] transition hover:bg-[#0f2a26]/[0.06] lg:hidden ${focusRing}`}
+          className={`flex h-10 w-10 items-center justify-center rounded-xl text-[#041e3f] transition hover:bg-[#041e3f]/[0.06] lg:hidden ${focusRing}`}
         >
           {open ? <X size={19} /> : <Menu size={19} />}
         </button>
@@ -284,7 +306,7 @@ function Header() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.2, ease }}
-            className="absolute inset-x-3 top-[64px] mx-auto max-w-[1100px] origin-top rounded-2xl border border-[#d9e2de] bg-white/95 p-2 shadow-[0_24px_60px_-20px_rgba(15,42,38,0.3)] backdrop-blur-xl sm:inset-x-5 sm:top-[70px] lg:hidden"
+            className="absolute inset-x-3 top-[64px] mx-auto max-w-[1100px] origin-top rounded-2xl border border-[#d8e1ec] bg-white/95 p-2 shadow-[0_24px_60px_-20px_rgba(4,30,63,0.3)] backdrop-blur-xl sm:inset-x-5 sm:top-[70px] lg:hidden"
           >
             <nav aria-label="Mobile" className="space-y-0.5">
               {navItems.map(([label, href]) => (
@@ -293,7 +315,7 @@ function Header() {
                   href={href}
                   onClick={() => setOpen(false)}
                   className={`block rounded-xl px-3.5 py-3 text-[15px] ${focusRing} ${
-                    active === href ? "bg-[#0f2a26]/[0.06] font-medium text-[#0f2a26]" : "text-[#4a5c57]"
+                    active === href ? "bg-[#041e3f]/[0.06] font-medium text-[#041e3f]" : "text-[#4a5a70]"
                   }`}
                 >
                   {label}
@@ -302,7 +324,7 @@ function Header() {
               <a
                 href="#consult"
                 onClick={() => setOpen(false)}
-                className={`mt-1.5 flex items-center justify-between rounded-xl bg-[#0f2a26] px-4 py-3.5 text-[15px] font-medium text-white ${focusRing}`}
+                className={`mt-1.5 flex items-center justify-between rounded-xl bg-[#041e3f] px-4 py-3.5 text-[15px] font-medium text-white ${focusRing}`}
               >
                 Start a conversation
                 <ArrowRight size={16} aria-hidden />
@@ -377,8 +399,8 @@ function HeroFlight({
       >
         <defs>
           <linearGradient id={`${uid}-route`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#0f2a26" stopOpacity="0.25" />
-            <stop offset="50%" stopColor="#0f2a26" stopOpacity="0.55" />
+            <stop offset="0%" stopColor="#041e3f" stopOpacity="0.25" />
+            <stop offset="50%" stopColor="#041e3f" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#d4a853" stopOpacity="0.8" />
           </linearGradient>
           <radialGradient id={`${uid}-glow`}>
@@ -389,13 +411,13 @@ function HeroFlight({
 
         <ellipse cx="340" cy="280" rx="220" ry="160" fill={`url(#${uid}-glow)`} />
 
-        <g fill="#b8c9c3" opacity="0.22">
+        <g fill="#b8c4d6" opacity="0.22">
           <ellipse cx="140" cy="340" rx="70" ry="85" />
           <ellipse cx="480" cy="200" rx="95" ry="70" />
           <ellipse cx="300" cy="380" rx="45" ry="35" />
         </g>
 
-        <g stroke="#a8bdb6" strokeWidth="0.7" opacity="0.28" fill="none">
+        <g stroke="#a8b6cb" strokeWidth="0.7" opacity="0.28" fill="none">
           <ellipse cx="320" cy="280" rx="240" ry="150" />
           <ellipse cx="320" cy="280" rx="140" ry="150" />
           <path d="M80 280H560M120 200H520M120 360H520" />
@@ -426,8 +448,8 @@ function HeroFlight({
           <g transform={`scale(${mobile ? 1.8 : 1}) translate(-11,-11)`}>
             <path
               d="M1 9 8 7 14 1 16 2 14 8 22 12 22 14 13 13 9 21 7 21 8 13 1 13Z"
-              fill="#0f2a26"
-              stroke="#f7f9f8"
+              fill="#041e3f"
+              stroke="#f6f8fb"
               strokeWidth="0.7"
             />
           </g>
@@ -437,13 +459,13 @@ function HeroFlight({
           cx="140"
           cy="340"
           r="16"
-          fill="#0f2a26"
+          fill="#041e3f"
           fillOpacity="0.08"
           animate={reduce ? undefined : { r: mobile ? [14, 28, 14] : [11, 20, 11] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
         />
-        <circle cx="140" cy="340" r={mobile ? 8 : 5.5} fill="#0f2a26" />
-        <circle cx="140" cy="340" r={mobile ? 3.2 : 2.2} fill="#f7f9f8" />
+        <circle cx="140" cy="340" r={mobile ? 8 : 5.5} fill="#041e3f" />
+        <circle cx="140" cy="340" r={mobile ? 3.2 : 2.2} fill="#f6f8fb" />
 
         <motion.circle
           cx="480"
@@ -455,12 +477,12 @@ function HeroFlight({
           transition={{ duration: 2.8, delay: 1.3, repeat: Infinity, ease: "easeInOut" }}
         />
         <circle cx="480" cy="200" r={mobile ? 8 : 5.5} fill="#d4a853" />
-        <circle cx="480" cy="200" r={mobile ? 3.2 : 2.2} fill="#f7f9f8" />
+        <circle cx="480" cy="200" r={mobile ? 3.2 : 2.2} fill="#f6f8fb" />
 
-        <text x={mobile ? 140 : 108} y={mobile ? 396 : 380} textAnchor={mobile ? "middle" : "start"} fontSize={mobile ? 21 : 13} fontWeight="600" fill="#0f2a26" opacity="0.65">
+        <text x={mobile ? 140 : 108} y={mobile ? 396 : 380} textAnchor={mobile ? "middle" : "start"} fontSize={mobile ? 21 : 13} fontWeight="600" fill="#041e3f" opacity="0.65">
           India
         </text>
-        <text x={mobile ? 480 : 445} y={mobile ? 254 : 235} textAnchor={mobile ? "middle" : "start"} fontSize={mobile ? 21 : 13} fontWeight="600" fill="#0f2a26" opacity="0.65">
+        <text x={mobile ? 480 : 445} y={mobile ? 254 : 235} textAnchor={mobile ? "middle" : "start"} fontSize={mobile ? 21 : 13} fontWeight="600" fill="#041e3f" opacity="0.65">
           United States
         </text>
       </svg>
@@ -478,7 +500,7 @@ function Hero() {
       id="top"
       className="relative -mt-16 flex min-h-[100svh] flex-col overflow-hidden pt-16 sm:-mt-[72px] sm:pt-[72px]"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-[#eef4f2] via-[#f7f9f8] to-[#f0f4f2]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#eef3f9] via-[#f6f8fb] to-[#f0f4f9]" />
       <HeroFlight
         parallax
         className="absolute inset-y-0 right-0 hidden w-[52%] lg:block"
@@ -496,7 +518,7 @@ function Hero() {
             India-based, for Indian investors
           </p>
 
-          <h1 className="text-balance text-[2.1rem] font-semibold leading-[1.05] tracking-tight text-[#0f2a26] sm:text-[3.4rem] lg:text-[3.9rem] xl:text-[4.4rem]">
+          <h1 className="text-balance text-[2.1rem] font-semibold leading-[1.05] tracking-tight text-[#041e3f] sm:text-[3.4rem] lg:text-[3.9rem] xl:text-[4.4rem]">
             Clear process support for your{" "}
             <span className="relative inline-block whitespace-nowrap">
               <span className="relative z-10">EB-5 journey</span>
@@ -510,7 +532,7 @@ function Hero() {
             </span>
           </h1>
 
-          <p className="mt-5 max-w-md text-[16px] leading-7 text-[#3f514c]">
+          <p className="mt-5 max-w-md text-[16px] leading-7 text-[#3d4d63]">
             We connect Indian investors with EB-5 specialist lawyers and keep documents and milestones organised.
           </p>
 
@@ -519,22 +541,22 @@ function Hero() {
               whileHover={reduce ? undefined : { y: -2 }}
               whileTap={reduce ? undefined : { scale: 0.98 }}
               href="#consult"
-              className={`inline-flex items-center gap-2 rounded-xl bg-[#0f2a26] px-5 py-3.5 text-[14px] font-semibold text-white shadow-[0_12px_28px_-8px_rgba(15,42,38,0.35)] transition hover:bg-[#163832] ${focusRing}`}
+              className={`inline-flex items-center gap-2 rounded-xl bg-[#041e3f] px-5 py-3.5 text-[14px] font-semibold text-white shadow-[0_12px_28px_-8px_rgba(4,30,63,0.35)] transition hover:bg-[#0b2c57] ${focusRing}`}
             >
               Start a conversation
               <ArrowRight size={16} aria-hidden />
             </motion.a>
             <a
               href="#services"
-              className={`inline-flex items-center gap-2 rounded-xl border border-[#c9d6d1] bg-white/80 px-5 py-3.5 text-[14px] font-medium text-[#0f2a26] backdrop-blur-sm transition hover:border-[#0f2a26]/30 hover:bg-white ${focusRing}`}
+              className={`inline-flex items-center gap-2 rounded-xl border border-[#c8d3e0] bg-white/80 px-5 py-3.5 text-[14px] font-medium text-[#041e3f] backdrop-blur-sm transition hover:border-[#041e3f]/30 hover:bg-white ${focusRing}`}
             >
               See how we help
               <ArrowDown size={15} aria-hidden />
             </a>
           </div>
 
-          <p className="mt-6 hidden items-center gap-2 text-[13px] text-[#4a5c57] sm:flex">
-            <ShieldCheck size={16} className="shrink-0 text-[#0f2a26]" strokeWidth={1.7} aria-hidden />
+          <p className="mt-6 hidden items-center gap-2 text-[13px] text-[#4a5a70] sm:flex">
+            <ShieldCheck size={16} className="shrink-0 text-[#041e3f]" strokeWidth={1.7} aria-hidden />
             No guaranteed outcomes. Every case is different.
           </p>
         </motion.div>
@@ -553,7 +575,7 @@ function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1, y: [0, 6, 0] }}
           transition={{ opacity: { delay: 1.8 }, y: { delay: 1.8, duration: 1.8, repeat: Infinity, ease: "easeInOut" } }}
-          className={`absolute bottom-5 left-1/2 hidden h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-[#c9d6d1] bg-white/80 text-[#0f2a26] sm:flex ${focusRing}`}
+          className={`absolute bottom-5 left-1/2 hidden h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-[#c8d3e0] bg-white/80 text-[#041e3f] sm:flex ${focusRing}`}
         >
           <ArrowDown size={16} aria-hidden />
         </motion.a>
@@ -571,7 +593,7 @@ function About() {
   const reduce = useReducedMotion();
 
   return (
-    <Section id="about" className="bg-[#0f2a26]" dark>
+    <Section id="about" className="bg-[#041e3f]" dark>
       <Reveal>
         <SectionHeading light tag="About us" description={aboutIntro}>
           Based in India, built for Indian investors
@@ -595,7 +617,7 @@ function About() {
                 {i < aboutRoles.length - 1 && (
                   <span
                     aria-hidden
-                    className="absolute right-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/15 bg-[#0f2a26] text-[#e3bd6a] md:flex"
+                    className="absolute right-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/15 bg-[#041e3f] text-[#e3bd6a] md:flex"
                   >
                     <ArrowRight size={14} />
                   </span>
@@ -634,9 +656,13 @@ function Services() {
   const reduce = useReducedMotion();
 
   return (
-    <Section id="services" className="bg-white">
+    <Section id="services" className="bg-[#041e3f]" dark>
       <Reveal>
-        <SectionHeading tag="What we do" description="Organised support from India, with EB-5 specialist lawyers by your side.">
+        <SectionHeading
+          light
+          tag="What we do"
+          description="Organised support from India, with EB-5 specialist lawyers by your side."
+        >
           Practical support at every stage
         </SectionHeading>
       </Reveal>
@@ -649,22 +675,26 @@ function Services() {
               <motion.article
                 whileHover={reduce ? undefined : { y: -6 }}
                 transition={{ duration: 0.3 }}
-                className="group relative flex h-full flex-col items-center overflow-hidden rounded-3xl border border-[#e2eae7] bg-gradient-to-b from-white to-[#f4f8f6] p-6 text-center lg:p-8 shadow-[0_1px_2px_rgba(15,42,38,0.04)] transition-all hover:border-[#d4a853]/50 hover:shadow-[0_30px_60px_-24px_rgba(15,42,38,0.2)]"
+                className="group relative flex h-full flex-col items-center overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center backdrop-blur-sm transition-[border-color,background-color] hover:border-[#d4a853]/40 hover:bg-white/[0.07] lg:p-8"
               >
                 <span
                   aria-hidden
                   className="absolute inset-x-8 top-0 h-px origin-center scale-x-0 bg-gradient-to-r from-transparent via-[#d4a853] to-transparent transition-transform duration-500 group-hover:scale-x-100"
                 />
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0f2a26] text-white shadow-lg shadow-[#0f2a26]/20 ring-4 ring-[#0f2a26]/[0.06]">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#d4a853]/10 text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
                   <Icon size={24} strokeWidth={1.6} aria-hidden />
                 </div>
-                <h3 className="mt-6 text-[1.3rem] font-semibold tracking-tight text-[#0f2a26]">{service.title}</h3>
-                <p className="mt-2 flex-1 text-[15px] leading-7 text-[#4a5c57]">{service.text}</p>
+                <h3 className="mt-6 text-[1.3rem] font-semibold tracking-tight text-white">
+                  {service.title}
+                </h3>
+                <p className="mt-2 flex-1 text-[15px] leading-7 text-white/70">
+                  {service.text}
+                </p>
                 <ul className="mt-6 flex flex-wrap justify-center gap-2">
                   {service.detail.map((item) => (
                     <li
                       key={item}
-                      className="rounded-full border border-[#dbe5e1] bg-white px-3 py-1 text-[12px] text-[#2a3d38]"
+                      className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1 text-[12px] text-white/80"
                     >
                       {item}
                     </li>
@@ -679,50 +709,153 @@ function Services() {
   );
 }
 
-/* ---------------------- PROCESS ---------------------- */
+/* ---------------------- ENGAGEMENT ---------------------- */
 
-function Process() {
+const engagementIconMap = { MessageCircle, Lock, FileText, RefreshCw, Send, Repeat } as const;
+
+function Engagement() {
   const reduce = useReducedMotion();
+  const listRef = useRef<HTMLOListElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: listRef,
+    offset: ["start 70%", "end 60%"],
+  });
+  const fill = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+  const fillHeight = useTransform(fill, (v) => `${v * 100}%`);
 
   return (
-    <Section id="process" className="bg-[#0f2a26]" dark>
+    <Section id="engagement" className="bg-[#eef3f9]">
       <Reveal>
-        <SectionHeading light tag="The process" description="A typical sequence. Every situation is different.">
-          How it unfolds
+        <SectionHeading tag="Engagement" description={engagementIntro}>
+          How the engagement works
         </SectionHeading>
       </Reveal>
 
-      <div className="relative">
-        {/* connecting line behind the numbered markers (desktop) */}
-        <motion.span
+      {/* Walkthrough: the step in the focus band pops forward, the others recede, and it replays on every pass */}
+      <div className="relative mx-auto max-w-4xl">
+        <div
           aria-hidden
-          initial={reduce ? false : { scaleX: 0 }}
-          whileInView={reduce ? undefined : { scaleX: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 1.4, ease }}
-          className="absolute left-[12.5%] right-[12.5%] top-5 hidden h-px origin-left bg-gradient-to-r from-[#d4a853]/10 via-[#d4a853]/60 to-[#d4a853]/10 lg:block"
-        />
-        <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {steps.map((step, i) => (
-            <li key={step.title}>
-              <Reveal delay={i * 0.1} className="flex flex-col items-center text-center">
-                <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#d4a853]/60 bg-[#0f2a26] text-[15px] font-semibold text-[#e3bd6a] shadow-[0_0_0_6px_#0f2a26,0_0_30px_-4px_rgba(212,168,83,0.45)]">
-                  {i + 1}
+          className="absolute bottom-10 left-5 top-6 w-px -translate-x-1/2 bg-[#c8d3e0] md:left-1/2"
+        >
+          <motion.div
+            style={{ height: reduce ? "100%" : fillHeight }}
+            className="w-full bg-[#d4a853]"
+          />
+        </div>
+
+        <ol ref={listRef} className="relative space-y-6 md:space-y-10">
+          {engagementSteps.map((step, i) => {
+            const Icon = engagementIconMap[step.icon];
+            const left = i % 2 === 0;
+            // once:false so the pop replays every time a step re-enters the focus band
+            const view = { once: false, amount: 0.5, margin: "-12% 0px -12% 0px" } as const;
+            return (
+              <li key={step.title} className="relative md:grid md:grid-cols-2">
+                {/* outer span handles position, inner span handles the pop */}
+                <span className="absolute left-5 top-7 z-10 -translate-x-1/2 md:left-1/2">
+                  <motion.span
+                    aria-hidden
+                    initial={reduce ? false : { scale: 0.7, opacity: 0.4, boxShadow: "0 0 0 6px #eef3f9, 0 0 0 0 rgba(212,168,83,0)" }}
+                    whileInView={reduce ? undefined : { scale: 1, opacity: 1, boxShadow: "0 0 0 6px #eef3f9, 0 0 26px 4px rgba(212,168,83,0.55)" }}
+                    viewport={view}
+                    transition={{ type: "spring", stiffness: 380, damping: 16 }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d4a853]/60 bg-[#041e3f] text-[15px] font-semibold text-[#e3bd6a]"
+                  >
+                    {i + 1}
+                  </motion.span>
                 </span>
-                <h3 className="mt-6 text-[1.2rem] font-semibold text-white">{step.title}</h3>
-                <p className="mt-2 max-w-[16rem] text-[15px] leading-7 text-white/70">{step.text}</p>
-              </Reveal>
-            </li>
-          ))}
+
+                <div
+                  className={`pl-14 md:pl-0 ${
+                    left ? "md:col-start-1 md:pr-14" : "md:col-start-2 md:pl-14"
+                  }`}
+                >
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0.3, scale: 0.9, y: 36 }}
+                    whileInView={reduce ? undefined : { opacity: 1, scale: 1, y: 0 }}
+                    viewport={view}
+                    transition={{ type: "spring", stiffness: 210, damping: 19, mass: 0.8, delay: 0.1 }}
+                    className={left ? "origin-left md:origin-right" : "origin-left"}
+                  >
+                    <motion.div
+                      whileHover={reduce ? undefined : { y: -4 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-start gap-4 rounded-3xl border border-[#d8e1ec] bg-white p-5 shadow-[0_1px_2px_rgba(4,30,63,0.04)] transition-[border-color,box-shadow] hover:border-[#d4a853]/50 hover:shadow-[0_24px_48px_-24px_rgba(4,30,63,0.2)] sm:p-6"
+                    >
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#041e3f] text-white shadow-md shadow-[#041e3f]/20">
+                        <Icon size={20} strokeWidth={1.6} aria-hidden />
+                      </span>
+                      <div>
+                        <p className="text-[12px] font-medium text-[#6b5214]">Step {i + 1}</p>
+                        <h3 className="mt-0.5 text-[1.15rem] font-semibold tracking-tight text-[#041e3f]">
+                          {step.title}
+                        </h3>
+                        <p className="mt-1.5 text-[15px] leading-7 text-[#4a5a70]">{step.text}</p>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </li>
+            );
+          })}
         </ol>
       </div>
+    </Section>
+  );
+}
 
-      <Reveal delay={0.3} className="mt-14 flex justify-center">
+/* ---------------------- FEES ---------------------- */
+
+const feeIconMap = { Briefcase, Repeat } as const;
+
+function Fees() {
+  const reduce = useReducedMotion();
+
+  return (
+    <Section id="fees" className="bg-[#041e3f]" dark>
+      <Reveal>
+        <SectionHeading light tag="Fees" description={feesNote}>
+          Pay the way that suits your practice
+        </SectionHeading>
+      </Reveal>
+
+      <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2 md:gap-5">
+        {feeModels.map((fee, i) => {
+          const Icon = feeIconMap[fee.icon];
+          return (
+            <Reveal key={fee.title} delay={i * 0.1} className="h-full">
+              <motion.div
+                whileHover={reduce ? undefined : { y: -5 }}
+                transition={{ duration: 0.3 }}
+                className="flex h-full flex-col items-center rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center backdrop-blur-sm transition hover:border-[#d4a853]/40 hover:bg-white/[0.07] sm:p-8"
+              >
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#d4a853]/10 text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
+                  <Icon size={24} strokeWidth={1.6} aria-hidden />
+                </span>
+                <h3 className="mt-5 text-[1.4rem] font-semibold tracking-tight text-white">{fee.title}</h3>
+                <p className="mt-2 flex-1 text-[15px] leading-7 text-white/70">{fee.text}</p>
+                <ul className="mt-6 flex flex-wrap justify-center gap-2">
+                  {fee.bullets.map((b) => (
+                    <li
+                      key={b}
+                      className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1 text-[12px] text-white/80"
+                    >
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            </Reveal>
+          );
+        })}
+      </div>
+
+      <Reveal delay={0.25} className="mt-12 flex justify-center">
         <a
           href="#consult"
-          className={`inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px] font-semibold text-[#0f2a26] transition hover:bg-[#eef4f2] ${focusRing}`}
+          className={`inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px] font-semibold text-[#041e3f] transition hover:bg-[#eef3f9] ${focusRing}`}
         >
-          Start a conversation
+          Discuss fees
           <ArrowRight size={16} aria-hidden />
         </a>
       </Reveal>
@@ -749,13 +882,13 @@ function Funds() {
             <Reveal delay={i * 0.07} className="h-full">
               <motion.div
                 whileHover={reduce ? undefined : { y: -4 }}
-                className="flex h-full flex-col items-center rounded-3xl border border-[#e2eae7] bg-gradient-to-b from-white to-[#f4f8f6] p-6 text-center transition hover:border-[#d4a853]/50 hover:shadow-[0_24px_48px_-24px_rgba(15,42,38,0.18)]"
+                className="flex h-full flex-col items-center rounded-3xl border border-[#e1e8f0] bg-gradient-to-b from-white to-[#f3f6fa] p-6 text-center transition hover:border-[#d4a853]/50 hover:shadow-[0_24px_48px_-24px_rgba(4,30,63,0.18)]"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0f2a26] text-sm font-semibold text-[#e3bd6a] ring-4 ring-[#0f2a26]/[0.06]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#041e3f] text-sm font-semibold text-[#e3bd6a] ring-4 ring-[#041e3f]/[0.06]">
                   {i + 1}
                 </span>
-                <h3 className="mt-5 text-[1.15rem] font-semibold text-[#0f2a26]">{item.title}</h3>
-                <p className="mt-1.5 text-[15px] leading-6 text-[#4a5c57]">{item.text}</p>
+                <h3 className="mt-5 text-[1.15rem] font-semibold text-[#041e3f]">{item.title}</h3>
+                <p className="mt-1.5 text-[15px] leading-6 text-[#4a5a70]">{item.text}</p>
               </motion.div>
             </Reveal>
           </li>
@@ -763,7 +896,7 @@ function Funds() {
       </ol>
 
       <Reveal delay={0.2} className="mx-auto mt-6 max-w-3xl">
-        <div className="relative overflow-hidden rounded-3xl bg-[#0f2a26] p-7 text-center text-white sm:p-9">
+        <div className="relative overflow-hidden rounded-3xl bg-[#041e3f] p-7 text-center text-white sm:p-9">
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-[#d4a853]/15 blur-3xl"
@@ -789,7 +922,7 @@ function Testimonials() {
   const reduce = useReducedMotion();
 
   return (
-    <Section id="testimonials" className="bg-[#eef4f2]">
+    <Section id="testimonials" className="bg-[#eef3f9]">
       <Reveal>
         <SectionHeading tag="Client stories">What clients say</SectionHeading>
       </Reveal>
@@ -802,19 +935,19 @@ function Testimonials() {
               <motion.figure
                 whileHover={reduce ? undefined : { y: -5 }}
                 transition={{ duration: 0.3 }}
-                className="flex h-full flex-col rounded-3xl border border-[#d9e2de] bg-white p-6 shadow-[0_1px_2px_rgba(15,42,38,0.04)] transition hover:border-[#d4a853]/50 hover:shadow-[0_30px_60px_-24px_rgba(15,42,38,0.18)] lg:p-8"
+                className="flex h-full flex-col rounded-3xl border border-[#d8e1ec] bg-white p-6 shadow-[0_1px_2px_rgba(4,30,63,0.04)] transition hover:border-[#d4a853]/50 hover:shadow-[0_30px_60px_-24px_rgba(4,30,63,0.18)] lg:p-8"
               >
                 <Quote size={26} className="text-[#d4a853]" strokeWidth={1.6} aria-hidden />
-                <blockquote className="mt-4 flex-1 text-[15px] leading-7 text-[#2a3d38] sm:text-[16px]">
+                <blockquote className="mt-4 flex-1 text-[15px] leading-7 text-[#26364d] sm:text-[16px]">
                   {item.quote}
                 </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3 border-t border-[#e2eae7] pt-5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0f2a26] text-[13px] font-semibold text-[#e3bd6a]">
+                <figcaption className="mt-6 flex items-center gap-3 border-t border-[#e1e8f0] pt-5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#041e3f] text-[13px] font-semibold text-[#e3bd6a]">
                     {item.name.replace(/[^A-Za-z]/g, "").slice(0, 2)}
                   </span>
                   <span className="text-[14px] leading-5">
-                    <span className="block font-semibold text-[#0f2a26]">{item.name}</span>
-                    <span className="block text-[#5a6b65]">{item.place}</span>
+                    <span className="block font-semibold text-[#041e3f]">{item.name}</span>
+                    <span className="block text-[#56667c]">{item.place}</span>
                   </span>
                 </figcaption>
               </motion.figure>
@@ -846,8 +979,8 @@ function FAQ() {
               <div
                 className={`overflow-hidden rounded-2xl border transition-all ${
                   isOpen
-                    ? "border-[#d4a853]/50 bg-white shadow-[0_16px_40px_-20px_rgba(15,42,38,0.2)]"
-                    : "border-[#e2eae7] bg-[#f7f9f8] hover:border-[#c5d4cf] hover:bg-[#f2f6f4]"
+                    ? "border-[#d4a853]/50 bg-white shadow-[0_16px_40px_-20px_rgba(4,30,63,0.2)]"
+                    : "border-[#e1e8f0] bg-[#f6f8fb] hover:border-[#c3d0e0] hover:bg-[#f1f5f9]"
                 }`}
               >
                 <h3>
@@ -859,10 +992,10 @@ function FAQ() {
                     id={`faq-btn-${i}`}
                     className={`flex w-full items-center justify-between gap-4 rounded-2xl px-5 py-4 text-left sm:px-6 sm:py-5 ${focusRing}`}
                   >
-                    <span className="text-[15px] font-medium leading-snug text-[#0f2a26] sm:text-[16px]">{faq.q}</span>
+                    <span className="text-[15px] font-medium leading-snug text-[#041e3f] sm:text-[16px]">{faq.q}</span>
                     <span
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition ${
-                        isOpen ? "bg-[#d4a853]/20 text-[#6b5214]" : "bg-[#eef4f2] text-[#5a6b65]"
+                        isOpen ? "bg-[#d4a853]/20 text-[#6b5214]" : "bg-[#eef3f9] text-[#56667c]"
                       }`}
                     >
                       <ChevronDown
@@ -885,7 +1018,7 @@ function FAQ() {
                       transition={{ duration: reduce ? 0 : 0.28, ease }}
                       className="overflow-hidden"
                     >
-                      <p className="px-5 pb-5 text-[15px] leading-7 text-[#3f514c] sm:px-6">{faq.a}</p>
+                      <p className="px-5 pb-5 text-[15px] leading-7 text-[#3d4d63] sm:px-6">{faq.a}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -936,7 +1069,7 @@ function Consultation() {
   }
 
   return (
-    <Section id="consult" className="bg-[#0f2a26]" dark>
+    <Section id="consult" className="bg-[#041e3f]" dark>
       <Reveal>
         <SectionHeading light tag="Get in touch" description="Tell us what you are exploring. No documents, no pressure.">
           Begin with a conversation
@@ -1021,7 +1154,7 @@ function Consultation() {
               whileTap={reduce || submitting ? undefined : { scale: 0.98 }}
               type="submit"
               disabled={submitting}
-              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px] font-semibold text-[#0f2a26] transition hover:bg-[#eef4f2] disabled:opacity-70 sm:w-auto sm:min-w-[16rem] ${focusRing}`}
+              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px] font-semibold text-[#041e3f] transition hover:bg-[#eef3f9] disabled:opacity-70 sm:w-auto sm:min-w-[16rem] ${focusRing}`}
             >
               {submitting ? "Submitting…" : "Request an introduction"}
               {!submitting && <ArrowRight size={16} aria-hidden />}
@@ -1078,12 +1211,12 @@ function MobileCTA() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ duration: 0.35, ease }}
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d9e2de] bg-white/95 px-4 pt-3 backdrop-blur-xl lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d8e1ec] bg-white/95 px-4 pt-3 backdrop-blur-xl lg:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <a
             href="#consult"
-            className={`flex items-center justify-center gap-2 rounded-xl bg-[#0f2a26] px-5 py-3.5 text-[14px] font-semibold text-white ${focusRing}`}
+            className={`flex items-center justify-center gap-2 rounded-xl bg-[#041e3f] px-5 py-3.5 text-[14px] font-semibold text-white ${focusRing}`}
           >
             Start a conversation
             <ArrowRight size={16} aria-hidden />
@@ -1108,11 +1241,11 @@ export default function LandingPage() {
         fontFamily:
           "var(--font-sans, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif)",
       }}
-      className="overflow-x-clip bg-[#f7f9f8] text-[#0f2a26] antialiased"
+      className="overflow-x-clip bg-[#f6f8fb] text-[#041e3f] antialiased"
     >
       <a
         href="#services"
-        className="sr-only z-[70] rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#0f2a26] focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        className="sr-only z-[70] rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#041e3f] focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
       >
         Skip to content
       </a>
@@ -1121,33 +1254,34 @@ export default function LandingPage() {
         <motion.div
           aria-hidden
           style={{ width: progressWidth }}
-          className="fixed left-0 top-0 z-[60] h-[2.5px] bg-gradient-to-r from-[#0f2a26] via-[#d4a853] to-[#d4a853]"
+          className="fixed left-0 top-0 z-[60] h-[2.5px] bg-gradient-to-r from-[#041e3f] via-[#d4a853] to-[#d4a853]"
         />
       )}
 
       <Header />
       <Hero />
       <Services />
-      <Process />
+      <Engagement />
+      <Fees />
       <Funds />
       <Testimonials />
       <About />
       <FAQ />
       <Consultation />
 
-      <footer className="border-t border-[#d9e2de] bg-white pb-20 lg:pb-0">
+      <footer className="border-t border-[#d8e1ec] bg-white pb-20 lg:pb-0">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center px-4 py-10 text-center sm:px-6 lg:px-8">
-          <p className="text-base font-semibold text-[#0f2a26]">Lawyers on Call</p>
-          <nav aria-label="Footer" className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] text-[#5a6b65]">
+          <p className="text-base font-semibold text-[#041e3f]">EB5 Paralegal</p>
+          <nav aria-label="Footer" className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[14px] text-[#56667c]">
             {navItems.map(([label, href]) => (
-              <a key={href} href={href} className={`rounded transition hover:text-[#0f2a26] ${focusRing}`}>
+              <a key={href} href={href} className={`rounded transition hover:text-[#041e3f] ${focusRing}`}>
                 {label}
               </a>
             ))}
           </nav>
-          <p className="mt-8 max-w-2xl border-t border-[#e2eae7] pt-5 text-[12px] leading-5 text-[#66766f]">
+          <p className="mt-8 max-w-2xl border-t border-[#e1e8f0] pt-5 text-[12px] leading-5 text-[#5f6f85]">
             General information only. Not legal, tax or investment advice. EB-5 investments carry risk, and no
-            immigration outcome or return is guaranteed. © {new Date().getFullYear()} Lawyers on Call.
+            immigration outcome or return is guaranteed. © {new Date().getFullYear()} EB5 Paralegal.
           </p>
         </div>
       </footer>
