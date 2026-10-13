@@ -29,7 +29,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const display = Instrument_Serif({ weight: "400", subsets: ["latin"], variable: "--font-display" });
 const sans = Hanken_Grotesk({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
-  title: "EB-5 investor immigration for| Lawyers on Call",
+  title: "EB-5 investor immigration| Lawyers on Call",
   description: "Clear, transparent support through every stage of the EB-5 process, from consultation to ongoing case support.",
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
