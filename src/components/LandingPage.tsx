@@ -518,7 +518,7 @@ function Hero() {
         >
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d4a853]/40 sm:mb-5 bg-[#d4a853]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#6b5214]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#d4a853]" />
-            EB-5 only. Built for law firms.
+            Expert support behind every case.
           </p>
 
           <h1 className="text-balance text-[length:clamp(1.85rem,5svh,2.7rem)] font-semibold leading-[1.08] tracking-tight text-[#041e3f] sm:text-[3.4rem] sm:leading-[1.05] lg:text-[3.9rem] xl:text-[4.4rem]">
