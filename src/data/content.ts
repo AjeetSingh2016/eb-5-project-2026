@@ -1,176 +1,164 @@
 export const navItems = [
   ["Services", "#services"],
+  ["About Us", "#about"],
   ["Engagement", "#engagement"],
-  ["Fees", "#fees"],
-  ["Funds", "#funds"],
-  ["Stories", "#testimonials"],
-  ["About", "#about"],
-  ["FAQ", "#faq"],
+  ["Testimonials", "#testimonials"],
+  ["Contact Us", "#consult"],
 ] as const;
 
+export const contactEmail = "eb5paralegal@gmail.com";
+export const contactPhone = "+91-9831366567";
+export const contactPhoneHref = "tel:+919831366567";
+
+/* Numbers are the numeric part only; the suffix is rendered next to the count-up. */
+export const stats = [
+  { value: 10, suffix: "+", label: "Years of combined experience" },
+  { value: 1600, suffix: "+", label: "Cases supported" },
+  { value: 97, suffix: "%", label: "Approval rate" },
+  { value: 21, suffix: "+", label: "Global attorney collaborations" },
+] as const;
+
+export const statsNote = "Figures are based on matters we have supported.";
+
 export const aboutLead =
-  "We deliver specialized legal process outsourcing services to U.S. immigration law firms handling EB-5 investor visas, H-1B employment-based petitions, and L-1 intra-company transfer cases.";
+  "EB5 Paralegal is a specialist EB-5 paralegal support partner. We help immigration law firms streamline case preparation, strengthen documentation workflows and scale their EB-5 practice. We work as an extension of your legal team and handle the document-heavy side of EB-5, so attorneys can focus on strategy, client counsel and case oversight.";
 
 export const aboutBlocks = [
   {
-    title: "Our expertise",
-    text: "Our team combines deep expertise in immigration law with meticulous attention to petition preparation, documentation management, and regulatory compliance.",
+    title: "Exclusive EB-5 focus",
+    text: "We only do EB-5. That gives us deeper subject knowledge, better efficiency and more consistent work than generalist support providers.",
   },
   {
-    title: "How we partner",
-    text: "We partner with law firms to streamline back-office workflows, reduce operational costs, and accelerate case processing – enabling attorneys to focus on client relationships and strategic counsel.",
+    title: "White-label team extension",
+    text: "Your clients see your firm. We handle the document workload behind the scenes.",
   },
-] as const;
-
-export const aboutPillars = [
-  { icon: "Check", label: "Accuracy" },
-  { icon: "ShieldCheck", label: "Integrity" },
-  { icon: "Lock", label: "Confidentiality" },
+  {
+    title: "Attorney-controlled workflow",
+    text: "Every deliverable is prepared for attorney review and final approval. Legal oversight stays entirely with your firm.",
+  },
+  {
+    title: "Structured delivery",
+    text: "Clear workflows, agreed timelines and regular progress updates. No surprises and no last-minute scrambles.",
+  },
 ] as const;
 
 export const services = [
   {
-    title: "Immigration LPO Services",
-    text: "Specialized legal process outsourcing services for U.S. immigration law firms.",
+    title: "Case assessment and planning",
+    text: "A tailored document checklist and an initial case review to plan the documentation.",
   },
   {
-    title: "EB-5 Visa Expertise",
-    text: "Deep expertise in EB-5 investor visas, including Source of Funds and Path of Funds analysis.",
+    title: "Source of funds analysis",
+    text: "Collection, organisation and financial tracing reports, with documentation mapping.",
   },
   {
-    title: "End-to-End Petition Support",
-    text: "Complete I-526E petition package preparation, including I-485 and DS-260 applications.",
+    title: "Attorney-ready drafting",
+    text: "Source of funds memos, declarations and cover letters prepared for attorney review.",
   },
   {
-    title: "Compliance & Documentation",
-    text: "Meticulous petition preparation, documentation management, regulatory compliance, and complex RFE and NOID responses.",
+    title: "RFE response support",
+    text: "We organise the evidence and draft response components for attorney sign-off.",
   },
   {
-    title: "Operational Efficiency",
-    text: "Streamlined back-office workflows that reduce operational costs and accelerate case processing.",
+    title: "Petition package preparation",
+    text: "I-526E and I-829 exhibit lists, indexes and a quality-control review.",
   },
   {
-    title: "Attorney Focus Enablement",
-    text: "Enables attorneys to focus on client relationships and strategic counsel.",
+    title: "End-to-end matter coordination",
+    text: "Progress tracking and coordination with translators and accountants.",
   },
 ] as const;
 
-export const fundItems = [
-  { title: "Origin", text: "Where was the capital earned?" },
-  { title: "Evidence", text: "Which records prove the source?" },
-  { title: "Movement", text: "Can transfers from India be traced?" },
-  { title: "Investment", text: "Is the final transfer documented?" },
-] as const;
+export const engagementIntro =
+  "All work is performed under your firm's direction and supervision. Attorneys keep full control of legal strategy, review and client representation at every stage.";
 
-export const questionsWorthAsking = [
-  "Check your lawyer’s credentials and EB-5 experience.",
-  "Read the engagement letter before paying fees.",
-  "Ask how sponsors and referrers are paid.",
-  "Review investment risks independently.",
-  "Never trust guaranteed approval or returns.",
-] as const;
-
-export const faqs = [
+export const engagementSteps = [
   {
-    q: "What is EB-5?",
-    a: "A US immigration pathway for investors who fund a new commercial enterprise and meet job-creation rules. An EB-5 specialist lawyer can explain how it applies to you.",
+    icon: "MessageCircle",
+    title: "Matter intake and case assignment",
+    text: "You refer a new EB-5 matter with a client brief and scope of work.",
   },
   {
-    q: "Who are the lawyers?",
-    a: "India-based lawyers who specialise in EB-5 for Indian investors. Scope and fees are confirmed in writing before you engage anyone.",
+    icon: "FileText",
+    title: "Engagement and kickoff",
+    text: "We sign an engagement letter and agree on deliverables, timeline and fees.",
   },
   {
-    q: "How are fees structured?",
-    a: "Flexibly. You can work per project or on a retainer. Scope, timelines and fees are agreed in writing before any work begins.",
+    icon: "Lock",
+    title: "Document collection",
+    text: "We request and collect source of funds documents, directly or through your team.",
   },
   {
-    q: "Does investing guarantee a Green Card?",
-    a: "No. Approval depends on evidence and adjudication, and investments carry financial risk.",
+    icon: "Repeat",
+    title: "Comprehensive case preparation",
+    text: "We organise and trace documents, and draft memoranda, summaries and petition components.",
   },
   {
-    q: "Can you help with Indian source of funds?",
-    a: "Yes. We organise bank statements, tax returns and sale deeds. Your lawyer reviews whether they meet the requirements.",
+    icon: "RefreshCw",
+    title: "Attorney review",
+    text: "Your attorney reviews, revises and signs off on all work.",
   },
   {
-    q: "Do you recommend investments?",
-    a: "No. We don’t give investment advice or manage projects.",
-  },
-  {
-    q: "What should I prepare for the first call?",
-    a: "Your goals, timeline and main questions. Don’t send sensitive documents through the web form.",
+    icon: "Send",
+    title: "Filing and post-submission support",
+    text: "The final package is filed under your firm's supervision. We help with RFEs as needed.",
   },
 ] as const;
 
 /* REPLACE BEFORE LAUNCH: these are placeholder entries. Use only real
    testimonials you have written consent to publish, and avoid any quote that
-   promises approval, timelines or returns. */
+   promises approval, timelines or outcomes. */
 export const testimonials = [
   {
-    quote: "I always knew what the next step was and who to ask. The checklist alone saved me weeks of back and forth.",
-    name: "R. S.",
-    place: "Mumbai",
+    quote: "Our attorneys now spend their time on strategy instead of exhibit lists. The work comes back organised and ready to review.",
+    name: "Anonymous",
+    place: "Law firm client",
   },
   {
-    quote: "They were clear from the first call about who does what and what it costs. No pressure at any point.",
-    name: "A. K.",
-    place: "Bengaluru",
+    quote: "Scope, timelines and fees were clear before we started, and the progress updates arrived on schedule every time.",
+    name: "Anonymous",
+    place: "Law firm client",
   },
   {
-    quote: "Organising bank statements and records for source of funds felt manageable instead of overwhelming.",
-    name: "P. M.",
-    place: "Delhi",
+    quote: "We took on more EB-5 matters without hiring. The team works like part of our own office.",
+    name: "Anonymous",
+    place: "Law firm client",
+  },
+  {
+    quote: "Source of funds files arrived organised, with clear summaries our attorneys could review quickly.",
+    name: "Anonymous",
+    place: "Law firm client",
+  },
+  {
+    quote: "Communication was prompt and professional. We always knew where each matter stood and what came next.",
+    name: "Anonymous",
+    place: "Law firm client",
   },
 ] as const;
 
-export const engagementIntro = "A streamlined, professional workflow built for law firms.";
-
-export const engagementSteps = [
-  {
-    icon: "MessageCircle",
-    title: "Initial Consultation",
-    text: "Discuss your practice needs, volume, preferred formats and deadlines.",
-  },
-  {
-    icon: "Lock",
-    title: "Secure Document Sharing",
-    text: "You provide client data, past filings and specifications through encrypted channels.",
-  },
-  {
-    icon: "FileText",
-    title: "Drafting & Preparation",
-    text: "Our team prepares drafts, forms, research notes or full petition packets as requested.",
-  },
-  {
-    icon: "RefreshCw",
-    title: "Review & Revision",
-    text: "You review and give feedback, and we make precise adjustments to meet your standards.",
-  },
-  {
-    icon: "Send",
-    title: "Final Delivery",
-    text: "We deliver polished, submission-ready documents within agreed timelines.",
-  },
-  {
-    icon: "Repeat",
-    title: "Ongoing Support",
-    text: "Flexible retainer or per-project models for continuous collaboration.",
-  },
+export const contactSteps = [
+  "Schedule a brief introductory call.",
+  "Share a sample matter or case brief.",
+  "Get a scope of work and fixed-fee proposal within 48 hours of review.",
+  "Sign the engagement letter and we begin.",
 ] as const;
 
-export const feesNote =
-  "Scope, timelines and fees are agreed in writing before any work begins.";
+export const footerLinks = [
+  ["Services", "#services"],
+  ["About Us", "#about"],
+  ["Engagement", "#engagement"],
+  ["Testimonials", "#testimonials"],
+] as const;
 
-export const feeModels = [
-  {
-    icon: "Briefcase",
-    title: "Per-project",
-    text: "A defined scope and price for a single filing, petition packet or research task.",
-    bullets: ["Single filing or packet", "Defined scope", "Agreed timeline"],
-  },
-  {
-    icon: "Repeat",
-    title: "Flexible retainer",
-    text: "Ongoing capacity for steady volume, with terms that fit your caseload.",
-    bullets: ["Steady volume", "Continuous collaboration", "Flexible terms"],
-  },
+export const footerContact = {
+  address: "154, Manicktalla Main Road, Kolkata-700054",
+  email: "info@lawyeroncall.in",
+  phone: "+91-9831366567",
+  phoneHref: "tel:+919831366567",
+};
+
+export const socials = [
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=100077637828241" },
+  { label: "Instagram", href: "https://www.instagram.com/lawyeroncall.in/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/lawyeroncall/" },
 ] as const;
