@@ -597,11 +597,7 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
-    if (reduce) {
-      setValue(to);
-      return;
-    }
-    if (!inView) return;
+    if (reduce || !inView) return;
     const controls = animate(0, to, {
       duration: 1.6,
       ease,
@@ -610,9 +606,11 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
     return () => controls.stop();
   }, [inView, reduce, to]);
 
+  const shown = reduce ? to : value;
+
   return (
     <span ref={ref}>
-      {value.toLocaleString("en-US")}
+      {shown.toLocaleString("en-US")}
       {suffix}
     </span>
   );
@@ -869,7 +867,7 @@ function Testimonials() {
   const reduce = useReducedMotion();
   const trackRef = useRef<HTMLUListElement>(null);
   const [index, setIndex] = useState(0);
-  const [positions, setPositions] = useState(testimonials.length);
+  const [positions, setPositions] = useState<number>(testimonials.length);
   const total = testimonials.length;
 
   /* Phones show 1 card, large screens show 3. Work out how many scroll positions that gives. */
@@ -891,9 +889,11 @@ function Testimonials() {
   };
 
   useEffect(() => {
-    sync();
-    window.addEventListener("resize", sync);
-    return () => window.removeEventListener("resize", sync);
+    const el = trackRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => sync());
+    ro.observe(el);
+    return () => ro.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
