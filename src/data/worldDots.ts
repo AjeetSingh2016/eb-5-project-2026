@@ -61,10 +61,10 @@ export const COUNTRIES: Record<CountryKey, CountryInfo> = {
    (South Asia, Oceania, Africa, Europe, and the Americas, where Brazil is the starting point),
    so a plane takes off from whichever region is facing you.
    bend = how high the arc lifts (flat map). via = optional waypoints [lon, lat] to fly through.
-   phone: false = leave this route off the flat phone map, where it would have to cross the whole map. */
-export const ROUTES: { from: CountryKey; to: CountryKey; bend: number; via?: [number, number][]; phone?: boolean }[] = [
+   showOnMap: false = leave this route (and its markers) off the map, e.g. when the flight would have to cross the whole map the wrong way. */
+export const ROUTES: { from: CountryKey; to: CountryKey; bend: number; via?: [number, number][]; showOnMap?: boolean }[] = [
   { from: "india", to: "newyork", bend: 0.3 },
-  { from: "australia", to: "losangeles", bend: 0.28, phone: false },
+  { from: "australia", to: "losangeles", bend: 0.28, showOnMap: false },
   { from: "nigeria", to: "houston", bend: 0.3 },
   { from: "germany", to: "boston", bend: 0.3 },
   { from: "brazil", to: "miami", bend: 0.3 },

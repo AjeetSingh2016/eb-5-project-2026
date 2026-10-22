@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Globe, { type GlobeMethods } from "react-globe.gl";
 import { feature } from "topojson-client";
 
@@ -9,31 +9,30 @@ import { COUNTRIES, ROUTES } from "@/data/worldDots";
 import { sampleLandDots, type LandPoint } from "@/data/landDots";
 import { FALLBACK_DOTS } from "@/data/globeDots";
 
-/* ---------- Globe styling ---------- */
+/* ---------- Appearance ---------- */
+
+const NAVY = "#041e3f";
 const GOLD = "#d4a853";
-const LAND_DOT = "#a9c4e8";
-const COMET = "#f0c966";
+const LAND_DOT = "#7c92b4";
+
 const SPIN_SPEED = 0.7;
 const CAMERA_ALTITUDE = 2.9;
 const START_VIEW = { lat: 22, lng: 79 };
 const SPIN_DELAY_MS = 1500;
+const FIRST_TAKEOFF_S = 2;
 
 const GLOBE_SURFACE =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR4nGPgt8oDIgYIBQASlgLd36YByAAAAABJRU5ErkJggg==";
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR4nGO4+eQTEDFAKABKzgq9DF2I0AAAAABJRU5ErkJggg==";
 
-/* ---------- Types ---------- */
-type Arc = {
-  startLat: number;
-  startLng: number;
-  endLat: number;
-  endLng: number;
-  color: [string, string];
-  stroke: number;
-  dashLength: number;
-  dashGap: number;
-  dashInitialGap: number;
-  dashTime: number;
-};
+/* ---------- Fallback land dots ---------- */
+
+const FALLBACK_LAND: LandPoint[] = Array.from(
+  { length: Math.floor(FALLBACK_DOTS.length / 2) },
+  (_, i) => ({
+    lng: FALLBACK_DOTS[2 * i],
+    lat: FALLBACK_DOTS[2 * i + 1],
+  })
+);
 
 type Ring = {
   lat: number;
@@ -47,77 +46,15 @@ type Label = {
   text: string;
 };
 
-type LandGeometry = {
-  type: string;
-  arcs?: unknown;
-  geometries?: LandGeometry[];
-  coordinates?: unknown;
-  properties?: Record<string, unknown>;
-};
+/* ---------- Country markers and labels ---------- */
 
-type LandTopology = {
-  type: "Topology";
-  objects: Record<string, LandGeometry>;
-  arcs: number[][][];
-  transform?: {
-    scale: [number, number];
-    translate: [number, number];
-  };
-};
-
-/* ---------- Fallback land dots ---------- */
-const FALLBACK_LAND: LandPoint[] = Array.from(
-  { length: Math.floor(FALLBACK_DOTS.length / 2) },
-  (_, i) => ({
-    lng: FALLBACK_DOTS[2 * i],
-    lat: FALLBACK_DOTS[2 * i + 1],
-  })
-);
-
-/* ---------- Build animated routes ---------- */
-function buildArcs(reduceMotion: boolean): Arc[] {
-  return ROUTES.flatMap((route, i) => {
-    const from = COUNTRIES[route.from];
-    const to = COUNTRIES[route.to];
-
-    const base: Arc = {
-      startLat: from.lat,
-      startLng: from.lon,
-      endLat: to.lat,
-      endLng: to.lon,
-      color: [
-        "rgba(240,201,102,0.35)",
-        "rgba(240,201,102,0.35)",
-      ],
-      stroke: 0.14,
-      dashLength: 1,
-      dashGap: 0,
-      dashInitialGap: 0,
-      dashTime: 0,
-    };
-
-    const comet: Arc = {
-      ...base,
-      color: [COMET, COMET],
-      stroke: 0.55,
-      dashLength: 0.22,
-      dashGap: 1.78,
-      dashInitialGap: (i / Math.max(ROUTES.length, 1)) * 2,
-      dashTime: reduceMotion ? 0 : 5200 + i * 450,
-    };
-
-    return [base, comet];
-  });
-}
-
-/* ---------- Pulsing rings ---------- */
 const rings: Ring[] = [
   ...Object.values(COUNTRIES)
     .filter((country) => country.kind === "origin")
     .map((country) => ({
       lat: country.lat,
       lng: country.lon,
-      color: "169,196,232",
+      color: "4,30,63",
     })),
 
   ...ROUTES.map((route) => ({
@@ -127,7 +64,6 @@ const rings: Ring[] = [
   })),
 ];
 
-/* ---------- Country labels ---------- */
 const labels: Label[] = Object.values(COUNTRIES)
   .filter((country) => country.name)
   .map((country) => ({
@@ -136,34 +72,148 @@ const labels: Label[] = Object.values(COUNTRIES)
     text: country.name,
   }));
 
+/* ---------- Flight calculations ---------- */
+
+const D2R = Math.PI / 180;
+
+type Vec3 = [number, number, number];
+
+const toVec = (lon: number, lat: number): Vec3 => [
+  Math.cos(lat * D2R) * Math.sin(lon * D2R),
+  Math.sin(lat * D2R),
+  Math.cos(lat * D2R) * Math.cos(lon * D2R),
+];
+
+const flights = ROUTES.map((route, index) => {
+  const A = toVec(
+    COUNTRIES[route.from].lon,
+    COUNTRIES[route.from].lat
+  );
+
+  const B = toVec(
+    COUNTRIES[route.to].lon,
+    COUNTRIES[route.to].lat
+  );
+
+  const dot = Math.min(
+    1,
+    Math.max(
+      -1,
+      A[0] * B[0] + A[1] * B[1] + A[2] * B[2]
+    )
+  );
+
+  const omega = Math.acos(dot);
+
+  return {
+    key: `${route.from}-${route.to}`,
+    A,
+    B,
+    omega,
+    lift: 0.06 + 0.12 * (omega / Math.PI),
+    duration: 6 + omega * 2.6,
+    delay: index * 1.1,
+    repeatDelay: 1.4 + (index % 3) * 0.9,
+  };
+});
+
+function flightPoint(
+  flight: (typeof flights)[number],
+  t: number
+): Vec3 {
+  const s = Math.sin(flight.omega) || 1;
+
+  const w1 = Math.sin((1 - t) * flight.omega) / s;
+  const w2 = Math.sin(t * flight.omega) / s;
+
+  const radius =
+    1 + flight.lift * Math.sin(Math.PI * t);
+
+  return [
+    (w1 * flight.A[0] + w2 * flight.B[0]) * radius,
+    (w1 * flight.A[1] + w2 * flight.B[1]) * radius,
+    (w1 * flight.A[2] + w2 * flight.B[2]) * radius,
+  ];
+}
+
+const easeInOut = (p: number) =>
+  p < 0.5
+    ? 2 * p * p
+    : 1 - Math.pow(-2 * p + 2, 2) / 2;
+
+/* ---------- Plane icon ---------- */
+
+const PLANE_PATH =
+  "M1 9 8 7 14 1 16 2 14 8 22 12 22 14 13 13 9 21 7 21 8 13 1 13Z";
+
+/* ---------- Camera types ---------- */
+
+type CameraLike = {
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  projectionMatrix: {
+    elements: number[];
+  };
+  matrixWorldInverse: {
+    elements: number[];
+  };
+};
+
+type LandTopology = {
+  type: "Topology";
+  objects: {
+    land: unknown;
+  };
+  arcs: unknown[];
+  transform?: {
+    scale: [number, number];
+    translate: [number, number];
+  };
+};
+
+type GlobeControls = {
+  autoRotate: boolean;
+  autoRotateSpeed: number;
+  enableZoom: boolean;
+};
+
 export default function GlobeScene({
   reduceMotion,
 }: {
   reduceMotion: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLCanvasElement>(null);
+
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
-  const spinTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
+  const spinTimer = useRef<number | undefined>(undefined);
 
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  const [landDots, setLandDots] = useState<LandPoint[]>(FALLBACK_LAND);
+  const [size, setSize] = useState({
+    w: 0,
+    h: 0,
+  });
 
-  const arcs = useMemo(() => buildArcs(reduceMotion), [reduceMotion]);
+  const [landDots, setLandDots] =
+    useState<LandPoint[]>(FALLBACK_LAND);
 
-  /* Clear timer on unmount */
+  /* ---------- Clear the delayed spin timer ---------- */
+
   useEffect(() => {
     return () => {
       if (spinTimer.current !== undefined) {
-        clearTimeout(spinTimer.current);
+        window.clearTimeout(spinTimer.current);
       }
     };
   }, []);
 
-  /* Measure globe container */
+  /* ---------- Measure the globe container ---------- */
+
   useEffect(() => {
     const element = wrapRef.current;
+
     if (!element) return;
 
     const observer = new ResizeObserver(([entry]) => {
@@ -180,7 +230,8 @@ export default function GlobeScene({
     return () => observer.disconnect();
   }, []);
 
-  /* Load land geometry without topojson-specification */
+  /* ---------- Load real land geometry ---------- */
+
   useEffect(() => {
     let cancelled = false;
 
@@ -194,27 +245,43 @@ export default function GlobeScene({
           );
         }
 
-        const topology = (await response.json()) as LandTopology;
+        // Explicitly type the downloaded JSON instead of leaving
+        // it as unknown.
+        const topology =
+          (await response.json()) as LandTopology;
 
         if (cancelled) return;
 
-        const landObject = topology.objects?.land;
-
-        if (!landObject) {
-          throw new Error(
-            "The topology file does not contain a land object."
-          );
+        if (
+          !topology ||
+          topology.type !== "Topology" ||
+          !topology.objects ||
+          !("land" in topology.objects)
+        ) {
+          throw new Error("Invalid land TopoJSON structure.");
         }
 
+        /*
+         * topojson-client's overloaded TypeScript definitions
+         * can infer the input as unknown in some configurations.
+         * The JSON is structurally validated above, so isolate
+         * the compatibility cast to this conversion call.
+         */
         const shapes = feature(
-          topology as Parameters<typeof feature>[0],
-          landObject as Parameters<typeof feature>[1]
-        );
+          topology as never,
+          topology.objects.land as never
+        ) as {
+          type: string;
+          features?: Parameters<typeof sampleLandDots>[0];
+        };
 
         const features =
-          shapes.type === "FeatureCollection" && shapes.features
+          shapes.type === "FeatureCollection" &&
+          shapes.features
             ? shapes.features
-            : [shapes];
+            : ([shapes] as unknown as Parameters<
+                typeof sampleLandDots
+              >[0]);
 
         const dots = sampleLandDots(features);
 
@@ -224,13 +291,16 @@ export default function GlobeScene({
           setLandDots(dots);
         } else {
           console.error(
-            "Globe: land data loaded but produced too few dots.",
+            "Globe: land data produced too few dots.",
             dots.length
           );
         }
       } catch (error: unknown) {
         if (!cancelled) {
-          console.error("Globe: could not load land data.", error);
+          console.error(
+            "Globe: could not load land data. Using fallback dots.",
+            error
+          );
         }
       }
     }
@@ -242,20 +312,272 @@ export default function GlobeScene({
     };
   }, []);
 
-  /* Configure initial camera view and rotation */
-  const onReady = () => {
-    const globe = globeRef.current;
-    if (!globe) return;
+  /* ---------- Animated flight paths and planes ---------- */
 
-    const controls = globe.controls() as unknown as {
-      autoRotate: boolean;
-      autoRotateSpeed: number;
-      enableZoom: boolean;
+  useEffect(() => {
+    const canvas = overlayRef.current;
+    const ctx = canvas?.getContext("2d");
+    const { w, h } = size;
+
+    if (!canvas || !ctx || !w || !h) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const planePath = new Path2D(PLANE_PATH);
+    const startTime = performance.now();
+
+    let raf = 0;
+
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame);
+
+      ctx.clearRect(0, 0, w, h);
+
+      const globe = globeRef.current;
+
+      if (!globe) return;
+
+      const cam = globe.camera() as unknown as CameraLike;
+
+      const center = globe.getCoords(0, 0, 0);
+
+      const radius = Math.hypot(
+        center.x,
+        center.y,
+        center.z
+      );
+
+      const view = cam.matrixWorldInverse.elements;
+      const projection = cam.projectionMatrix.elements;
+
+      /* Project a 3D point onto the canvas. */
+
+      const place = (v: Vec3) => {
+        const r = Math.hypot(v[0], v[1], v[2]);
+
+        const latitude = Math.asin(v[1] / r) / D2R;
+        const longitude = Math.atan2(v[0], v[2]) / D2R;
+
+        const point = globe.getCoords(
+          latitude,
+          longitude,
+          r - 1
+        );
+
+        const vx =
+          view[0] * point.x +
+          view[4] * point.y +
+          view[8] * point.z +
+          view[12];
+
+        const vy =
+          view[1] * point.x +
+          view[5] * point.y +
+          view[9] * point.z +
+          view[13];
+
+        const vz =
+          view[2] * point.x +
+          view[6] * point.y +
+          view[10] * point.z +
+          view[14];
+
+        const cx =
+          projection[0] * vx +
+          projection[4] * vy +
+          projection[8] * vz +
+          projection[12];
+
+        const cy =
+          projection[1] * vx +
+          projection[5] * vy +
+          projection[9] * vz +
+          projection[13];
+
+        const cw =
+          projection[3] * vx +
+          projection[7] * vy +
+          projection[11] * vz +
+          projection[15] || 1;
+
+        return {
+          x: ((cx / cw + 1) / 2) * w,
+          y: ((1 - cy / cw) / 2) * h,
+
+          near:
+            point.x * cam.position.x +
+              point.y * cam.position.y +
+              point.z * cam.position.z >
+            radius * radius,
+        };
+      };
+
+      /* Draw only the visible sections of a route. */
+
+      const strokeRoute = (
+        flight: (typeof flights)[number],
+        from: number,
+        to: number,
+        steps: number
+      ) => {
+        ctx.beginPath();
+
+        let penDown = false;
+
+        for (let k = 0; k <= steps; k++) {
+          const t = from + ((to - from) * k) / steps;
+          const screenPoint = place(flightPoint(flight, t));
+
+          if (screenPoint.near) {
+            if (penDown) {
+              ctx.lineTo(screenPoint.x, screenPoint.y);
+            } else {
+              ctx.moveTo(screenPoint.x, screenPoint.y);
+            }
+
+            penDown = true;
+          } else {
+            penDown = false;
+          }
+        }
+
+        ctx.stroke();
+      };
+
+      const seconds =
+        (now - startTime) / 1000 - FIRST_TAKEOFF_S;
+
+      for (const flight of flights) {
+        /* Faint route line. */
+
+        ctx.strokeStyle = "rgba(4,30,63,0.28)";
+        ctx.lineWidth = 1.3;
+        ctx.lineCap = "round";
+
+        strokeRoute(flight, 0, 1, 56);
+
+        /* Calculate the plane's progress. */
+
+        let progress = 0.5;
+
+        if (!reduceMotion) {
+          const local = seconds - flight.delay;
+
+          if (local < 0) continue;
+
+          const cycle =
+            flight.duration + flight.repeatDelay;
+
+          const cycleProgress = local % cycle;
+
+          if (cycleProgress > flight.duration) continue;
+
+          progress = cycleProgress / flight.duration;
+        }
+
+        const easedProgress = easeInOut(progress);
+
+        const edge = Math.max(
+          0,
+          Math.min(
+            1,
+            progress / 0.1,
+            (1 - progress) / 0.1
+          )
+        );
+
+        /* Gold trail behind the plane. */
+
+        ctx.strokeStyle = `rgba(212,168,83,${0.95 * edge})`;
+        ctx.lineWidth = 3;
+
+        strokeRoute(
+          flight,
+          Math.max(0, easedProgress - 0.12),
+          easedProgress,
+          14
+        );
+
+        /* Plane position and direction. */
+
+        const here = place(
+          flightPoint(flight, easedProgress)
+        );
+
+        if (!here.near) continue;
+
+        const ahead = place(
+          flightPoint(
+            flight,
+            Math.min(1, easedProgress + 0.012)
+          )
+        );
+
+        const angle = Math.atan2(
+          ahead.y - here.y,
+          ahead.x - here.x
+        );
+
+        ctx.save();
+
+        ctx.globalAlpha = 0.25 + 0.75 * edge;
+        ctx.translate(here.x, here.y);
+        ctx.rotate(angle);
+
+        const scale = 1.15 * (0.6 + 0.4 * edge);
+
+        ctx.scale(scale, scale);
+        ctx.translate(-11, -11);
+
+        ctx.fillStyle = NAVY;
+        ctx.strokeStyle = "#f6f8fb";
+        ctx.lineWidth = 0.9;
+
+        ctx.fill(planePath);
+        ctx.stroke(planePath);
+
+        ctx.restore();
+      }
     };
 
-    controls.autoRotate = false;
-    controls.autoRotateSpeed = SPIN_SPEED;
-    controls.enableZoom = false;
+    raf = requestAnimationFrame(frame);
+
+    return () => cancelAnimationFrame(raf);
+  }, [size, reduceMotion]);
+
+  /* ---------- Configure the globe ---------- */
+
+  const onReady = () => {
+    const globe = globeRef.current;
+
+    if (!globe) return;
+
+    /*
+     * Guard against versions or wrappers where controls()
+     * is not exposed as a callable method.
+     */
+    const controlsMethod = (
+      globe as unknown as {
+        controls?: () => GlobeControls;
+      }
+    ).controls;
+
+    let controls: GlobeControls | undefined;
+
+    if (typeof controlsMethod === "function") {
+      controls = controlsMethod.call(globe);
+    }
+
+    if (controls) {
+      controls.autoRotate = false;
+      controls.autoRotateSpeed = SPIN_SPEED;
+      controls.enableZoom = false;
+    }
 
     globe.pointOfView(
       {
@@ -265,21 +587,23 @@ export default function GlobeScene({
       0
     );
 
-    if (spinTimer.current !== undefined) {
-      clearTimeout(spinTimer.current);
-    }
+    if (!reduceMotion && controls) {
+      if (spinTimer.current !== undefined) {
+        window.clearTimeout(spinTimer.current);
+      }
 
-    if (!reduceMotion) {
-      spinTimer.current = setTimeout(() => {
+      spinTimer.current = window.setTimeout(() => {
         controls.autoRotate = true;
       }, SPIN_DELAY_MS);
     }
   };
 
+  /* ---------- Render ---------- */
+
   return (
     <div
       ref={wrapRef}
-      className="pointer-events-auto h-full w-full cursor-grab active:cursor-grabbing"
+      className="pointer-events-auto relative h-full w-full cursor-grab active:cursor-grabbing"
     >
       {size.w > 0 && size.h > 0 && (
         <Globe
@@ -293,32 +617,25 @@ export default function GlobeScene({
           atmosphereAltitude={0.16}
           /* Land dots */
           pointsData={landDots}
-          pointLat={(d: object) => (d as LandPoint).lat}
-          pointLng={(d: object) => (d as LandPoint).lng}
+          pointLat={(d: object) =>
+            (d as LandPoint).lat
+          }
+          pointLng={(d: object) =>
+            (d as LandPoint).lng
+          }
           pointColor={() => LAND_DOT}
           pointRadius={0.22}
           pointAltitude={0.006}
           pointResolution={5}
           pointsMerge
-          /* Route arcs and travelling comets */
-          arcsData={arcs}
-          arcStartLat={(d: object) => (d as Arc).startLat}
-          arcStartLng={(d: object) => (d as Arc).startLng}
-          arcEndLat={(d: object) => (d as Arc).endLat}
-          arcEndLng={(d: object) => (d as Arc).endLng}
-          arcColor={(d: object) => (d as Arc).color}
-          arcStroke={(d: object) => (d as Arc).stroke}
-          arcDashLength={(d: object) => (d as Arc).dashLength}
-          arcDashGap={(d: object) => (d as Arc).dashGap}
-          arcDashInitialGap={(d: object) =>
-            (d as Arc).dashInitialGap
-          }
-          arcDashAnimateTime={(d: object) => (d as Arc).dashTime}
-          arcAltitudeAutoScale={0.4}
           /* Pulsing rings */
           ringsData={reduceMotion ? [] : rings}
-          ringLat={(d: object) => (d as Ring).lat}
-          ringLng={(d: object) => (d as Ring).lng}
+          ringLat={(d: object) =>
+            (d as Ring).lat
+          }
+          ringLng={(d: object) =>
+            (d as Ring).lng
+          }
           ringColor={(d: object) => (t: number) =>
             `rgba(${(d as Ring).color},${1 - t})`
           }
@@ -327,10 +644,16 @@ export default function GlobeScene({
           ringRepeatPeriod={1900}
           /* Country labels */
           labelsData={labels}
-          labelLat={(d: object) => (d as Label).lat}
-          labelLng={(d: object) => (d as Label).lng}
-          labelText={(d: object) => (d as Label).text}
-          labelColor={() => "#ffffff"}
+          labelLat={(d: object) =>
+            (d as Label).lat
+          }
+          labelLng={(d: object) =>
+            (d as Label).lng
+          }
+          labelText={(d: object) =>
+            (d as Label).text
+          }
+          labelColor={() => NAVY}
           labelSize={0.9}
           labelDotRadius={0.35}
           labelResolution={2}
@@ -338,6 +661,12 @@ export default function GlobeScene({
           onGlobeReady={onReady}
         />
       )}
+
+      {/* The overlay canvas draws animated flights above the globe. */}
+      <canvas
+        ref={overlayRef}
+        className="pointer-events-none absolute inset-0 h-full w-full"
+      />
     </div>
   );
 }
