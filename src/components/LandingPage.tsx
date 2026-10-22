@@ -235,7 +235,7 @@ function Header() {
       >
         <a
           href="#top"
-          aria-label="EB-5 Paralegal — Your path, Our purpose"
+          aria-label="EB-5 Paralegal — Your Investors, Our Expertise"
           className={`group flex min-w-0 items-center gap-1.5 rounded-lg ${focusRing}`}
         >
           <Image
@@ -252,7 +252,7 @@ function Header() {
               <span className="text-[#a8791c]">Paralegal</span>
             </span>
             <span className="mt-1 truncate text-[8.5px] font-semibold uppercase leading-none tracking-[0.12em] text-[#5f6f85] sm:text-[9.5px]">
-              Your path, Our purpose
+              Your Investors, Our Expertise
             </span>
           </span>
         </a>
@@ -1220,7 +1220,7 @@ function Footer() {
                   <span className="text-[#a8791c]">Paralegal</span>
                 </span>
                 <span className="mt-1 text-[9.5px] font-semibold uppercase leading-none tracking-[0.12em] text-[#5f6f85]">
-                  Your path, Our purpose
+                  Your Investors, Our Expertise
                 </span>
               </span>
             </a>
