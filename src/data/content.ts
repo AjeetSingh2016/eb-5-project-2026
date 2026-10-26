@@ -76,7 +76,7 @@ export const engagementSteps = [
   {
     icon: "MessageCircle",
     title: "Matter intake and case assignment",
-    text: "You refer a new EB-5 matter with a client brief and scope of work.",
+    text: "You assign a new EB-5 matter with a client brief and scope of work.",
   },
   {
     icon: "FileText",
@@ -110,29 +110,19 @@ export const engagementSteps = [
    promises approval, timelines or outcomes. */
 export const testimonials = [
   {
-    quote: "Our attorneys now spend their time on strategy instead of exhibit lists. The work comes back organised and ready to review.",
-    name: "Anonymous",
-    place: "Law firm client",
-  },
-  {
     quote: "Scope, timelines and fees were clear before we started, and the progress updates arrived on schedule every time.",
     name: "Anonymous",
-    place: "Law firm client",
-  },
-  {
-    quote: "We took on more EB-5 matters without hiring. The team works like part of our own office.",
-    name: "Anonymous",
-    place: "Law firm client",
+    place: "Managing partner",
   },
   {
     quote: "Source of funds files arrived organised, with clear summaries our attorneys could review quickly.",
     name: "Anonymous",
-    place: "Law firm client",
+    place: "Lead immigration paralegal",
   },
   {
     quote: "Communication was prompt and professional. We always knew where each matter stood and what came next.",
     name: "Anonymous",
-    place: "Law firm client",
+    place: "Senior case manager",
   },
 ] as const;
 
@@ -158,7 +148,5 @@ export const footerContact = {
 };
 
 export const socials = [
-  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=100077637828241" },
-  { label: "Instagram", href: "https://www.instagram.com/lawyeroncall.in/" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/lawyeroncall/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/eb5-paralegal/" },
 ] as const;

@@ -68,6 +68,7 @@ import {
   COUNTRIES,
   ROUTES,
   project,
+  wrappedPath,
   type CountryKey,
 } from "@/data/worldDots";
 
@@ -163,8 +164,7 @@ function Section({
   children: ReactNode;
 }) {
   const dot = dark ? "rgba(255,255,255,0.08)" : "rgba(4,30,63,0.10)";
-  const mask =
-    "radial-gradient(ellipse 75% 65% at 50% 40%, #000 25%, transparent 75%)";
+  const mask = "radial-gradient(ellipse 75% 65% at 50% 40%, #000 25%, transparent 75%)";
   return (
     <section
       id={id}
@@ -186,9 +186,7 @@ function Section({
           }`}
         />
       </div>
-      <div className="relative mx-auto w-full max-w-[1100px] px-4 xl:max-w-[1200px] sm:px-6 lg:px-8">
-        {children}
-      </div>
+      <div className="relative mx-auto w-full max-w-[1100px] px-4 xl:max-w-[1200px] sm:px-6 lg:px-8">{children}</div>
     </section>
   );
 }
@@ -215,14 +213,7 @@ function Header() {
   }, [open]);
 
   useEffect(() => {
-    const ids = [
-      "top",
-      "services",
-      "about",
-      "engagement",
-      "testimonials",
-      "consult",
-    ];
+    const ids = ["top", "services", "about", "engagement", "testimonials", "consult"];
     const elements = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
@@ -276,19 +267,14 @@ function Header() {
           </span>
         </a>
 
-        <nav
-          aria-label="Primary"
-          className="hidden flex-1 items-center justify-center gap-0.5 lg:flex xl:gap-1"
-        >
+        <nav aria-label="Primary" className="hidden flex-1 items-center justify-center gap-0.5 lg:flex xl:gap-1">
           {navItems.map(([label, href]) => (
             <a
               key={href}
               href={href}
               aria-current={active === href ? "true" : undefined}
               className={`relative rounded-full px-3 py-1.5 text-[13px] xl:px-3.5 font-medium transition-colors ${focusRing} ${
-                active === href
-                  ? "text-[#041e3f]"
-                  : "text-[#4a5a70] hover:text-[#041e3f]"
+                active === href ? "text-[#041e3f]" : "text-[#4a5a70] hover:text-[#041e3f]"
               }`}
             >
               {active === href && (
@@ -340,9 +326,7 @@ function Header() {
                   href={href}
                   onClick={() => setOpen(false)}
                   className={`block rounded-xl px-3.5 py-3 text-[15px] ${focusRing} ${
-                    active === href
-                      ? "bg-[#041e3f]/[0.06] font-medium text-[#041e3f]"
-                      : "text-[#4a5a70]"
+                    active === href ? "bg-[#041e3f]/[0.06] font-medium text-[#041e3f]" : "text-[#4a5a70]"
                   }`}
                 >
                   {label}
@@ -367,21 +351,31 @@ function Header() {
 /* ---------------------- HERO ---------------------- */
 
 /* Immigration routes between countries (no cities). Geometry is computed once, at module load. */
-const PLANE_PATH =
-  "M1 9 8 7 14 1 16 2 14 8 22 12 22 14 13 13 9 21 7 21 8 13 1 13Z";
+const PLANE_PATH = "M1 9 8 7 14 1 16 2 14 8 22 12 22 14 13 13 9 21 7 21 8 13 1 13Z";
 const TRAIL_LENGTH = 0.16; /* share of the route covered by the glowing trail */
 
 /* Routes drawn on the map. A route can be left off with showOnMap: false in worldDots.ts. */
 const shownRoutes = ROUTES.filter((r) => r.showOnMap !== false);
 
 /* Only countries with a plane get a marker, so there are never dots without a flight */
-const markedCountries = new Set<CountryKey>(
-  shownRoutes.flatMap((r) => [r.from, r.to]),
-);
+const markedCountries = new Set<CountryKey>(shownRoutes.flatMap((r) => [r.from, r.to]));
 
 const flightRoutes = shownRoutes.map((r, i) => {
   const a = COUNTRIES[r.from];
   const b = COUNTRIES[r.to];
+
+  /* A flight across the Pacific leaves the map on one side and comes back in on the other */
+  if (r.wrap) {
+    const w = wrappedPath(a.lon, a.lat, b.lon, b.lat);
+    return {
+      key: `${r.from}-${r.to}`,
+      d: w.d,
+      duration: 5 + w.length / 110,
+      delay: 0.8 + i * 0.85,
+      repeatDelay: 1.2 + (i % 3) * 0.9,
+    };
+  }
+
   const pts = [
     project(a.lon, a.lat),
     ...(r.via ?? []).map(([lo, la]) => project(lo, la)),
@@ -458,10 +452,7 @@ function FlightRoute({
       const p = path.getPointAtLength(t * len);
       const q = path.getPointAtLength(Math.min(len, t * len + 1));
       const angle = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI;
-      plane.setAttribute(
-        "transform",
-        `translate(${p.x} ${p.y}) rotate(${angle})`,
-      );
+      plane.setAttribute("transform", `translate(${p.x} ${p.y}) rotate(${angle})`);
       trail.setAttribute("stroke-dashoffset", String(TRAIL_LENGTH - t));
       const o = t < 0.06 ? t / 0.06 : t > 0.9 ? (1 - t) / 0.1 : 1;
       plane.setAttribute("opacity", String(o));
@@ -515,12 +506,7 @@ function FlightRoute({
       />
       <g ref={planeRef} opacity={0}>
         <g transform={`scale(${mobile ? 1.7 : 1.15}) translate(-11,-11)`}>
-          <path
-            d={PLANE_PATH}
-            fill="#041e3f"
-            stroke="#f6f8fb"
-            strokeWidth="0.8"
-          />
+          <path d={PLANE_PATH} fill="#041e3f" stroke="#f6f8fb" strokeWidth="0.8" />
         </g>
       </g>
     </>
@@ -560,13 +546,7 @@ function HeroFlight({
           </radialGradient>
         </defs>
 
-        <ellipse
-          cx={WORLD_W / 2}
-          cy={WORLD_H / 2}
-          rx={470}
-          ry={230}
-          fill={`url(#${uid}-glow)`}
-        />
+        <ellipse cx={WORLD_W / 2} cy={WORLD_H / 2} rx={470} ry={230} fill={`url(#${uid}-glow)`} />
 
         {/* Dotted world map */}
         <path
@@ -593,80 +573,67 @@ function HeroFlight({
         ))}
 
         {/* Country markers (only where a plane takes off or lands) */}
-        {(
-          Object.entries(COUNTRIES) as [
-            CountryKey,
-            (typeof COUNTRIES)[CountryKey],
-          ][]
-        )
+        {(Object.entries(COUNTRIES) as [CountryKey, (typeof COUNTRIES)[CountryKey]][])
           .filter(([key]) => markedCountries.has(key))
           .map(([key, c], i) => {
-            const [x, y] = project(c.lon, c.lat);
-            const color = c.kind === "origin" ? "#041e3f" : "#d4a853";
-            return (
-              <g key={key}>
-                <motion.circle
-                  cx={x}
-                  cy={y}
-                  r={mobile ? 9 : 8}
-                  fill={color}
-                  fillOpacity={0.16}
-                  animate={
-                    reduce ? undefined : { r: mobile ? [9, 22, 9] : [8, 17, 8] }
-                  }
-                  transition={{
-                    duration: 2.8,
-                    delay: (i % 5) * 0.55,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-                <circle cx={x} cy={y} r={mobile ? 7 : 5.5} fill={color} />
-                <circle cx={x} cy={y} r={mobile ? 3 : 2.2} fill="#f6f8fb" />
-                {(!mobile || c.showOnPhone) && c.name && (
-                  <text
-                    x={x + c.label.dx}
-                    y={y + c.label.dy}
-                    textAnchor={c.label.anchor}
-                    fontSize={labelSize}
-                    fontWeight={600}
-                    fill="#041e3f"
-                    fillOpacity={0.8}
-                    stroke="#eef3f9"
-                    strokeWidth={4}
-                    strokeLinejoin="round"
-                    paintOrder="stroke"
-                  >
-                    {c.name}
-                  </text>
-                )}
-              </g>
-            );
-          })}
+          const [x, y] = project(c.lon, c.lat);
+          const color = c.kind === "origin" ? "#041e3f" : "#d4a853";
+          return (
+            <g key={key}>
+              <motion.circle
+                cx={x}
+                cy={y}
+                r={mobile ? 9 : 8}
+                fill={color}
+                fillOpacity={0.16}
+                animate={reduce ? undefined : { r: mobile ? [9, 22, 9] : [8, 17, 8] }}
+                transition={{ duration: 2.8, delay: (i % 5) * 0.55, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <circle cx={x} cy={y} r={mobile ? 7 : 5.5} fill={color} />
+              <circle cx={x} cy={y} r={mobile ? 3 : 2.2} fill="#f6f8fb" />
+              {(!mobile || c.showOnPhone) && c.name && (
+                <text
+                  x={x + c.label.dx}
+                  y={y + c.label.dy}
+                  textAnchor={c.label.anchor}
+                  fontSize={labelSize}
+                  fontWeight={600}
+                  fill="#041e3f"
+                  fillOpacity={0.8}
+                  stroke="#eef3f9"
+                  strokeWidth={4}
+                  strokeLinejoin="round"
+                  paintOrder="stroke"
+                >
+                  {c.name}
+                </text>
+              )}
+            </g>
+          );
+        })}
 
         {/* "United States" name (text only: planes land at the cities) */}
-        {(!mobile || COUNTRIES.usa.showOnPhone) &&
-          (() => {
-            const u = COUNTRIES.usa;
-            const [x, y] = project(u.lon, u.lat);
-            return (
-              <text
-                x={x + u.label.dx}
-                y={y + u.label.dy}
-                textAnchor={u.label.anchor}
-                fontSize={labelSize}
-                fontWeight={600}
-                fill="#041e3f"
-                fillOpacity={0.8}
-                stroke="#eef3f9"
-                strokeWidth={4}
-                strokeLinejoin="round"
-                paintOrder="stroke"
-              >
-                {u.name}
-              </text>
-            );
-          })()}
+        {(!mobile || COUNTRIES.usa.showOnPhone) && (() => {
+          const u = COUNTRIES.usa;
+          const [x, y] = project(u.lon, u.lat);
+          return (
+            <text
+              x={x + u.label.dx}
+              y={y + u.label.dy}
+              textAnchor={u.label.anchor}
+              fontSize={labelSize}
+              fontWeight={600}
+              fill="#041e3f"
+              fillOpacity={0.8}
+              stroke="#eef3f9"
+              strokeWidth={4}
+              strokeLinejoin="round"
+              paintOrder="stroke"
+            >
+              {u.name}
+            </text>
+          );
+        })()}
       </svg>
     </motion.div>
   );
@@ -676,31 +643,28 @@ function HeroFlight({
    It sits behind the transparent sticky header, so header + hero = 100svh. */
 function Hero() {
   const reduce = useReducedMotion();
-return (
-  <section
-    id="top"
-    className="relative -mt-16 flex min-h-[calc(100svh-3.8rem-max(0.75rem,env(safe-area-inset-bottom,0px)))] flex-col overflow-hidden pt-16 sm:-mt-[72px] sm:pt-[72px] lg:min-h-[100svh]"
-  >
-    <div className="absolute inset-0 bg-[#eef3f9] lg:bg-gradient-to-br lg:from-[#eef3f9] lg:via-[#f6f8fb] lg:to-[#f0f4f9]" />
 
-    {/* Desktop flight with rounded elliptical clipping */}
-    <div className="absolute inset-y-0 right-8 hidden w-[52%] overflow-hidden rounded-[50%] lg:block">
-      <HeroFlight
-        parallax
-        className="absolute inset-0 h-full w-full"
-      />
-    </div>
+  return (
+    <section
+      id="top"
+      className="relative -mt-16 flex min-h-[calc(100svh-3.8rem-max(0.75rem,env(safe-area-inset-bottom,0px)))] flex-col overflow-hidden pt-16 sm:-mt-[72px] sm:pt-[72px] lg:min-h-[100svh]"
+    >
+      <div className="absolute inset-0 bg-[#eef3f9] lg:bg-gradient-to-br lg:from-[#eef3f9] lg:via-[#f6f8fb] lg:to-[#f0f4f9]" />
+      {/* Desktop flight with rounded elliptical clipping */}
+      <div className="absolute inset-y-0 right-8 hidden w-[52%] overflow-hidden rounded-[50%] lg:block">
+        <HeroFlight parallax className="absolute inset-0 h-full w-full" />
+      </div>
 
-    <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col justify-start px-4 pt-3 sm:px-6 sm:pt-8 lg:justify-center lg:px-8 lg:py-8">
-      {/* Text zone */}
-      <div className="flex flex-1 items-center lg:block lg:flex-none">
+      <div className="relative mx-auto flex w-full max-w-[1200px] flex-1 flex-col justify-start px-4 pt-3 sm:px-6 sm:pt-8 lg:justify-center lg:px-8 lg:py-8">
+        {/* Text zone: on phones it takes the space above the animation and centres its content in it */}
+        <div className="flex flex-1 items-center lg:block lg:flex-none">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease }}
           className="relative z-10 max-w-xl lg:max-w-[48%]"
         >
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d4a853]/40 bg-[#d4a853]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#6b5214] sm:mb-5">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d4a853]/40 sm:mb-5 bg-[#d4a853]/10 px-3.5 py-1.5 text-[12px] font-medium text-[#6b5214]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#d4a853]" />
             Behind Every Approval, Expert Support
           </p>
@@ -720,9 +684,7 @@ return (
           </h1>
 
           <p className="mt-4 max-w-md text-[15px] leading-6 text-[#3d4d63] sm:mt-5 sm:text-[16px] sm:leading-7">
-            We work as a white-label extension of your team. We handle the
-            document-heavy side of EB-5 cases while your attorneys keep full
-            control.
+            We work as a white-label extension of your team. We handle the document-heavy side of EB-5 cases while your attorneys keep full control.
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3 sm:mt-7">
@@ -730,12 +692,11 @@ return (
               whileHover={reduce ? undefined : { y: -2 }}
               whileTap={reduce ? undefined : { scale: 0.98 }}
               href="#consult"
-              className={`hidden items-center gap-2 rounded-xl bg-[#041e3f] px-5 py-3.5 text-[14px] font-semibold text-white shadow-[0_12px_28px_-8px_rgba(4,30,63,0.35)] transition hover:bg-[#0b2c57] sm:inline-flex ${focusRing}`}
+              className={`hidden items-center gap-2 rounded-xl bg-[#041e3f] px-5 py-3.5 sm:inline-flex text-[14px] font-semibold text-white shadow-[0_12px_28px_-8px_rgba(4,30,63,0.35)] transition hover:bg-[#0b2c57] ${focusRing}`}
             >
               Partner with us
               <ArrowRight size={16} aria-hidden />
             </motion.a>
-
             <a
               href="#services"
               className={`inline-flex items-center gap-2 rounded-xl border border-[#c8d3e0] bg-white/80 px-5 py-3.5 text-[14px] font-medium text-[#041e3f] backdrop-blur-sm transition hover:border-[#041e3f]/30 hover:bg-white ${focusRing}`}
@@ -746,46 +707,33 @@ return (
           </div>
 
           <p className="mt-5 hidden items-center gap-2 text-[13px] text-[#4a5a70] sm:mt-6 sm:flex [@media(min-height:780px)]:flex">
-            <ShieldCheck
-              size={16}
-              className="shrink-0 text-[#041e3f]"
-              strokeWidth={1.7}
-              aria-hidden
-            />
+            <ShieldCheck size={16} className="shrink-0 text-[#041e3f]" strokeWidth={1.7} aria-hidden />
             We deliver tailored solutions that empower businesses to grow.
           </p>
         </motion.div>
+        </div>
+
+        {/* Phones and tablets: full-width flight anchored at the bottom of the hero */}
+        <HeroFlight
+          mobile
+          className="relative -mx-4 h-[clamp(150px,25svh,240px)] shrink-0 sm:-mx-6 sm:h-[clamp(240px,32svh,380px)] lg:hidden [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_16%)] [mask-image:linear-gradient(to_bottom,transparent,black_16%)]"
+        />
       </div>
 
-      {/* Mobile flight: unchanged */}
-      <HeroFlight
-        mobile
-        className="relative -mx-4 h-[clamp(150px,25svh,240px)] shrink-0 sm:-mx-6 sm:h-[clamp(240px,32svh,380px)] lg:hidden [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_16%)] [mask-image:linear-gradient(to_bottom,transparent,black_16%)]"
-      />
-    </div>
-
-    {!reduce && (
-      <motion.a
-        href="#stats"
-        aria-label="Scroll down"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, y: [0, 6, 0] }}
-        transition={{
-          opacity: { delay: 1.8 },
-          y: {
-            delay: 1.8,
-            duration: 1.8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          },
-        }}
-        className={`absolute bottom-5 left-1/2 hidden h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-[#c8d3e0] bg-white/80 text-[#041e3f] sm:flex ${focusRing}`}
-      >
-        <ArrowDown size={16} aria-hidden />
-      </motion.a>
-    )}
-  </section>
-);
+      {!reduce && (
+        <motion.a
+          href="#stats"
+          aria-label="Scroll down"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 6, 0] }}
+          transition={{ opacity: { delay: 1.8 }, y: { delay: 1.8, duration: 1.8, repeat: Infinity, ease: "easeInOut" } }}
+          className={`absolute bottom-5 left-1/2 hidden h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-[#c8d3e0] bg-white/80 text-[#041e3f] sm:flex ${focusRing}`}
+        >
+          <ArrowDown size={16} aria-hidden />
+        </motion.a>
+      )}
+    </section>
+  );
 }
 
 /* ---------------------- STATS ---------------------- */
@@ -818,10 +766,7 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
 
 function Stats() {
   return (
-    <section
-      id="stats"
-      className="scroll-mt-16 bg-[#eef3f9] pb-12 pt-6 sm:py-16"
-    >
+    <section id="stats" className="scroll-mt-16 bg-[#eef3f9] pb-12 pt-6 sm:py-16">
       <div className="mx-auto w-full max-w-[1100px] px-4 sm:px-6 lg:px-8 xl:max-w-[1200px]">
         <div className="relative">
           {/* Mobile cross: each arm ends at the middle of its block */}
@@ -852,9 +797,7 @@ function Stats() {
             ))}
           </dl>
         </div>
-        <p className="mt-6 text-center text-[12px] text-[#5f6f85] sm:mt-8">
-          {statsNote}
-        </p>
+        <p className="mt-6 text-center text-[12px] text-[#5f6f85] sm:mt-8">{statsNote}</p>
       </div>
     </section>
   );
@@ -895,9 +838,7 @@ function Services() {
               <h3 className="mt-5 text-[1.2rem] font-semibold tracking-tight text-white">
                 {service.title}
               </h3>
-              <p className="mt-2 text-[15px] leading-7 text-white/70">
-                {service.text}
-              </p>
+              <p className="mt-2 text-[15px] leading-7 text-white/70">{service.text}</p>
             </motion.article>
           </Reveal>
         ))}
@@ -936,10 +877,7 @@ function About() {
             <h2 className="relative text-balance text-[1.9rem] font-semibold leading-[1.1] tracking-tight sm:text-[2.4rem] lg:text-[2.6rem]">
               A specialist partner for your EB-5 practice
             </h2>
-            <span
-              aria-hidden
-              className="relative mt-5 h-[3px] w-12 rounded-full bg-[#d4a853]"
-            />
+            <span aria-hidden className="relative mt-5 h-[3px] w-12 rounded-full bg-[#d4a853]" />
             <p className="relative mt-5 text-[15px] leading-7 text-white/75 sm:text-[16px] sm:leading-8">
               {aboutLead}
             </p>
@@ -964,12 +902,8 @@ function About() {
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#041e3f] text-[#e3bd6a] shadow-md shadow-[#041e3f]/20">
                     <Icon size={20} strokeWidth={1.6} aria-hidden />
                   </span>
-                  <h3 className="mt-5 text-[1.1rem] font-semibold tracking-tight text-[#041e3f]">
-                    {block.title}
-                  </h3>
-                  <p className="mt-2 text-[15px] leading-7 text-[#4a5a70]">
-                    {block.text}
-                  </p>
+                  <h3 className="mt-5 text-[1.1rem] font-semibold tracking-tight text-[#041e3f]">{block.title}</h3>
+                  <p className="mt-2 text-[15px] leading-7 text-[#4a5a70]">{block.text}</p>
                 </motion.div>
               </Reveal>
             );
@@ -982,14 +916,7 @@ function About() {
 
 /* ---------------------- ENGAGEMENT ---------------------- */
 
-const engagementIconMap = {
-  MessageCircle,
-  Lock,
-  FileText,
-  RefreshCw,
-  Send,
-  Repeat,
-} as const;
+const engagementIconMap = { MessageCircle, Lock, FileText, RefreshCw, Send, Repeat } as const;
 
 function Engagement() {
   const reduce = useReducedMotion();
@@ -1026,37 +953,15 @@ function Engagement() {
             const Icon = engagementIconMap[step.icon];
             const left = i % 2 === 0;
             // once:false so the pop replays every time a step re-enters the focus band
-            const view = {
-              once: false,
-              amount: 0.5,
-              margin: "-12% 0px -12% 0px",
-            } as const;
+            const view = { once: false, amount: 0.5, margin: "-12% 0px -12% 0px" } as const;
             return (
               <li key={step.title} className="relative md:grid md:grid-cols-2">
                 {/* outer span handles position, inner span handles the pop */}
                 <span className="absolute left-5 top-7 z-10 -translate-x-1/2 md:left-1/2">
                   <motion.span
                     aria-hidden
-                    initial={
-                      reduce
-                        ? false
-                        : {
-                            scale: 0.7,
-                            opacity: 0.4,
-                            boxShadow:
-                              "0 0 0 6px #eef3f9, 0 0 0 0 rgba(212,168,83,0)",
-                          }
-                    }
-                    whileInView={
-                      reduce
-                        ? undefined
-                        : {
-                            scale: 1,
-                            opacity: 1,
-                            boxShadow:
-                              "0 0 0 6px #eef3f9, 0 0 26px 4px rgba(212,168,83,0.55)",
-                          }
-                    }
+                    initial={reduce ? false : { scale: 0.7, opacity: 0.4, boxShadow: "0 0 0 6px #eef3f9, 0 0 0 0 rgba(212,168,83,0)" }}
+                    whileInView={reduce ? undefined : { scale: 1, opacity: 1, boxShadow: "0 0 0 6px #eef3f9, 0 0 26px 4px rgba(212,168,83,0.55)" }}
                     viewport={view}
                     transition={{ type: "spring", stiffness: 380, damping: 16 }}
                     className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d4a853]/60 bg-[#041e3f] text-[15px] font-semibold text-[#e3bd6a]"
@@ -1071,23 +976,11 @@ function Engagement() {
                   }`}
                 >
                   <motion.div
-                    initial={
-                      reduce ? false : { opacity: 0.3, scale: 0.9, y: 36 }
-                    }
-                    whileInView={
-                      reduce ? undefined : { opacity: 1, scale: 1, y: 0 }
-                    }
+                    initial={reduce ? false : { opacity: 0.3, scale: 0.9, y: 36 }}
+                    whileInView={reduce ? undefined : { opacity: 1, scale: 1, y: 0 }}
                     viewport={view}
-                    transition={{
-                      type: "spring",
-                      stiffness: 210,
-                      damping: 19,
-                      mass: 0.8,
-                      delay: 0.1,
-                    }}
-                    className={
-                      left ? "origin-left md:origin-right" : "origin-left"
-                    }
+                    transition={{ type: "spring", stiffness: 210, damping: 19, mass: 0.8, delay: 0.1 }}
+                    className={left ? "origin-left md:origin-right" : "origin-left"}
                   >
                     <motion.div
                       whileHover={reduce ? undefined : { y: -4 }}
@@ -1098,15 +991,11 @@ function Engagement() {
                         <Icon size={20} strokeWidth={1.6} aria-hidden />
                       </span>
                       <div>
-                        <p className="text-[12px] font-medium text-[#6b5214]">
-                          Step {i + 1}
-                        </p>
+                        <p className="text-[12px] font-medium text-[#6b5214]">Step {i + 1}</p>
                         <h3 className="mt-0.5 text-[1.15rem] font-semibold tracking-tight text-[#041e3f]">
                           {step.title}
                         </h3>
-                        <p className="mt-1.5 text-[15px] leading-7 text-[#4a5a70]">
-                          {step.text}
-                        </p>
+                        <p className="mt-1.5 text-[15px] leading-7 text-[#4a5a70]">{step.text}</p>
                       </div>
                     </motion.div>
                   </motion.div>
@@ -1161,10 +1050,7 @@ function Testimonials() {
     if (!m) return;
     const count = m.last + 1;
     const next = (i + count) % count;
-    m.el.scrollTo({
-      left: next * m.itemW,
-      behavior: reduce ? "auto" : "smooth",
-    });
+    m.el.scrollTo({ left: next * m.itemW, behavior: reduce ? "auto" : "smooth" });
   };
 
   const navBtn = `flex h-11 w-11 items-center justify-center rounded-full border border-[#d8e1ec] bg-white text-[#041e3f] shadow-sm transition hover:border-[#d4a853] hover:bg-[#041e3f] hover:text-white ${focusRing}`;
@@ -1176,11 +1062,7 @@ function Testimonials() {
       </Reveal>
 
       <Reveal className="mx-auto max-w-3xl lg:max-w-none">
-        <div
-          role="group"
-          aria-roledescription="carousel"
-          aria-label="Client testimonials"
-        >
+        <div role="group" aria-roledescription="carousel" aria-label="Client testimonials">
           {/* 1 testimonial per view on phones and tablets, 3 on large screens. Swipe, scroll sideways or use the arrows. */}
           <ul
             ref={trackRef}
@@ -1196,12 +1078,7 @@ function Testimonials() {
                 className="w-full shrink-0 snap-start px-1 py-3 sm:px-2 lg:w-1/3"
               >
                 <figure className="flex h-full flex-col items-center rounded-3xl border border-[#d8e1ec] bg-[#f6f8fb] p-7 text-center shadow-[0_1px_2px_rgba(4,30,63,0.04)] sm:p-10 lg:p-8">
-                  <Quote
-                    size={32}
-                    className="text-[#d4a853]"
-                    strokeWidth={1.6}
-                    aria-hidden
-                  />
+                  <Quote size={32} className="text-[#d4a853]" strokeWidth={1.6} aria-hidden />
                   <blockquote className="mt-5 flex-1 text-[17px] leading-8 text-[#26364d] sm:text-[20px] sm:leading-9 lg:text-[16px] lg:leading-7">
                     {item.quote}
                   </blockquote>
@@ -1210,9 +1087,7 @@ function Testimonials() {
                       <User size={18} strokeWidth={1.8} aria-hidden />
                     </span>
                     <span className="text-left text-[14px] leading-5">
-                      <span className="block font-semibold text-[#041e3f]">
-                        {item.name}
-                      </span>
+                      <span className="block font-semibold text-[#041e3f]">{item.name}</span>
                       <span className="block text-[#56667c]">{item.place}</span>
                     </span>
                   </figcaption>
@@ -1221,14 +1096,9 @@ function Testimonials() {
             ))}
           </ul>
 
-          {/* Controls */}
-          <div className="mt-6 flex items-center justify-center gap-5">
-            <button
-              type="button"
-              onClick={() => goTo(index - 1)}
-              aria-label="Previous testimonials"
-              className={navBtn}
-            >
+          {/* Controls (hidden when every testimonial already fits on screen) */}
+          <div className={`mt-6 items-center justify-center gap-5 ${positions > 1 ? "flex" : "hidden"}`}>
+            <button type="button" onClick={() => goTo(index - 1)} aria-label="Previous testimonials" className={navBtn}>
               <ChevronLeft size={20} aria-hidden />
             </button>
             <div className="flex items-center gap-2">
@@ -1240,19 +1110,12 @@ function Testimonials() {
                   aria-label={`Go to position ${i + 1}`}
                   aria-current={index === i ? "true" : undefined}
                   className={`h-2.5 rounded-full transition-all duration-300 ${focusRing} ${
-                    index === i
-                      ? "w-7 bg-[#d4a853]"
-                      : "w-2.5 bg-[#c8d3e0] hover:bg-[#a8b6cb]"
+                    index === i ? "w-7 bg-[#d4a853]" : "w-2.5 bg-[#c8d3e0] hover:bg-[#a8b6cb]"
                   }`}
                 />
               ))}
             </div>
-            <button
-              type="button"
-              onClick={() => goTo(index + 1)}
-              aria-label="Next testimonials"
-              className={navBtn}
-            >
+            <button type="button" onClick={() => goTo(index + 1)} aria-label="Next testimonials" className={navBtn}>
               <ChevronRight size={20} aria-hidden />
             </button>
           </div>
@@ -1266,10 +1129,7 @@ function Testimonials() {
 
 function Contact() {
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const reduce = useReducedMotion();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -1294,18 +1154,10 @@ function Contact() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
-      setStatus({
-        type: "success",
-        message:
-          "Thank you. We will be in touch to schedule an introductory call.",
-      });
+      setStatus({ type: "success", message: "Thank you. We will be in touch to schedule an introductory call." });
       form.reset();
     } catch {
-      setStatus({
-        type: "error",
-        message:
-          "We couldn’t send your message. Please try again or email us directly.",
-      });
+      setStatus({ type: "error", message: "We couldn’t send your message. Please try again or email us directly." });
     } finally {
       setSubmitting(false);
     }
@@ -1326,15 +1178,10 @@ function Contact() {
       <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-10">
         <Reveal className="h-full">
           <div className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.04] p-6 sm:p-8">
-            <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">
-              How to get started
-            </h3>
+            <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">How to get started</h3>
             <ol className="mt-5 space-y-4">
               {contactSteps.map((step, i) => (
-                <li
-                  key={step}
-                  className="flex gap-3 text-[15px] leading-6 text-white/80"
-                >
+                <li key={step} className="flex gap-3 text-[15px] leading-6 text-white/80">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#d4a853]/15 text-[12px] font-semibold text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
                     {i + 1}
                   </span>
@@ -1347,22 +1194,14 @@ function Contact() {
                 href={`mailto:${contactEmail}`}
                 className={`flex items-center gap-3 rounded text-white/90 transition hover:text-white ${focusRing}`}
               >
-                <Mail
-                  size={16}
-                  className="shrink-0 text-[#e3bd6a]"
-                  aria-hidden
-                />
+                <Mail size={16} className="shrink-0 text-[#e3bd6a]" aria-hidden />
                 <span className="break-all">{contactEmail}</span>
               </a>
               <a
                 href={contactPhoneHref}
                 className={`flex items-center gap-3 rounded text-white/90 transition hover:text-white ${focusRing}`}
               >
-                <Phone
-                  size={16}
-                  className="shrink-0 text-[#e3bd6a]"
-                  aria-hidden
-                />
+                <Phone size={16} className="shrink-0 text-[#e3bd6a]" aria-hidden />
                 {contactPhone}
               </a>
             </div>
@@ -1377,10 +1216,7 @@ function Contact() {
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label
-                  htmlFor="name"
-                  className="mb-1.5 block text-[13px] text-white/80"
-                >
+                <label htmlFor="name" className="mb-1.5 block text-[13px] text-white/80">
                   Full name
                 </label>
                 <input
@@ -1395,10 +1231,7 @@ function Contact() {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="email"
-                  className="mb-1.5 block text-[13px] text-white/80"
-                >
+                <label htmlFor="email" className="mb-1.5 block text-[13px] text-white/80">
                   Work email
                 </label>
                 <input
@@ -1416,10 +1249,7 @@ function Contact() {
             </div>
 
             <div className="mt-4">
-              <label
-                htmlFor="firm"
-                className="mb-1.5 block text-[13px] text-white/80"
-              >
+              <label htmlFor="firm" className="mb-1.5 block text-[13px] text-white/80">
                 Law firm
               </label>
               <input
@@ -1434,10 +1264,7 @@ function Contact() {
             </div>
 
             <div className="mt-4">
-              <label
-                htmlFor="message"
-                className="mb-1.5 block text-[13px] text-white/80"
-              >
+              <label htmlFor="message" className="mb-1.5 block text-[13px] text-white/80">
                 How can we help?
               </label>
               <textarea
@@ -1473,9 +1300,7 @@ function Contact() {
               {status && (
                 <p
                   className={`mt-4 rounded-xl px-4 py-3 text-center text-[14px] ${
-                    status.type === "success"
-                      ? "bg-emerald-500/15 text-emerald-100"
-                      : "bg-rose-500/15 text-rose-100"
+                    status.type === "success" ? "bg-emerald-500/15 text-emerald-100" : "bg-rose-500/15 text-rose-100"
                   }`}
                 >
                   {status.message}
@@ -1512,10 +1337,6 @@ function MobileCTA() {
 /* ---------------------- FOOTER ---------------------- */
 
 const socialPaths: Record<string, string> = {
-  Facebook:
-    "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z",
-  Instagram:
-    "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z",
   LinkedIn:
     "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z",
 };
@@ -1529,10 +1350,7 @@ function Footer() {
         {/* Columns */}
         <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_1.4fr_0.9fr] lg:gap-12">
           <div>
-            <a
-              href="#top"
-              className={`inline-flex items-center gap-1.5 rounded-lg ${focusRing}`}
-            >
+            <a href="#top" className={`inline-flex items-center gap-1.5 rounded-lg ${focusRing}`}>
               <Image
                 src="/logov2.png"
                 alt=""
@@ -1556,16 +1374,11 @@ function Footer() {
           </div>
 
           <nav aria-label="Footer">
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6b5214]">
-              Quick Links
-            </h3>
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6b5214]">Quick Links</h3>
             <ul className="mt-5 space-y-3">
               {footerLinks.map(([label, href]) => (
                 <li key={href}>
-                  <a
-                    href={href}
-                    className={`group inline-flex items-center gap-1.5 ${linkCls}`}
-                  >
+                  <a href={href} className={`group inline-flex items-center gap-1.5 ${linkCls}`}>
                     <ArrowRight
                       size={13}
                       aria-hidden
@@ -1579,41 +1392,21 @@ function Footer() {
           </nav>
 
           <div>
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6b5214]">
-              Contact
-            </h3>
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6b5214]">Contact</h3>
             <ul className="mt-5 space-y-4 text-[14px] leading-6 text-[#4a5a70]">
               <li className="flex gap-3">
-                <MapPin
-                  size={17}
-                  className="mt-0.5 shrink-0 text-[#a8791c]"
-                  aria-hidden
-                />
+                <MapPin size={17} className="mt-0.5 shrink-0 text-[#a8791c]" aria-hidden />
                 <span>{footerContact.address}</span>
               </li>
               <li>
-                <a
-                  href={`mailto:${footerContact.email}`}
-                  className={`flex gap-3 transition hover:text-[#041e3f] ${focusRing}`}
-                >
-                  <Mail
-                    size={17}
-                    className="mt-0.5 shrink-0 text-[#a8791c]"
-                    aria-hidden
-                  />
+                <a href={`mailto:${footerContact.email}`} className={`flex gap-3 transition hover:text-[#041e3f] ${focusRing}`}>
+                  <Mail size={17} className="mt-0.5 shrink-0 text-[#a8791c]" aria-hidden />
                   <span className="break-all">{footerContact.email}</span>
                 </a>
               </li>
               <li>
-                <a
-                  href={footerContact.phoneHref}
-                  className={`flex gap-3 transition hover:text-[#041e3f] ${focusRing}`}
-                >
-                  <Phone
-                    size={17}
-                    className="mt-0.5 shrink-0 text-[#a8791c]"
-                    aria-hidden
-                  />
+                <a href={footerContact.phoneHref} className={`flex gap-3 transition hover:text-[#041e3f] ${focusRing}`}>
+                  <Phone size={17} className="mt-0.5 shrink-0 text-[#a8791c]" aria-hidden />
                   {footerContact.phone}
                 </a>
               </li>
@@ -1621,9 +1414,7 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6b5214]">
-              Follow Us
-            </h3>
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#6b5214]">Follow Us</h3>
             <ul className="mt-5 flex gap-3">
               {socials.map((social) => (
                 <li key={social.label}>
@@ -1634,12 +1425,7 @@ function Footer() {
                     aria-label={social.label}
                     className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#d8e1ec] bg-[#f6f8fb] text-[#041e3f] transition hover:-translate-y-0.5 hover:border-[#041e3f] hover:bg-[#041e3f] hover:text-white ${focusRing}`}
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="h-4 w-4"
-                      aria-hidden
-                    >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
                       <path d={socialPaths[social.label]} />
                     </svg>
                   </a>
@@ -1652,12 +1438,12 @@ function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-[#e1e8f0] py-6 text-center text-[12px] leading-5 text-[#5f6f85]">
           <p className="mx-auto max-w-3xl">
-            EB5 Paralegal provides paralegal support to law firms. All work is
-            performed under the direction and supervision of your firm.
+            <span className="font-semibold text-[#4a5a70]">Disclaimer:</span> EB5 Paralegals provides paralegal and
+            case preparation support services exclusively to attorneys and law firms. We do not provide legal advice,
+            represent clients, or establish attorney-client relationships. All work product is prepared for attorney
+            review and approval.
           </p>
-          <p className="mt-2">
-            © {new Date().getFullYear()} EB5 Paralegal. All rights reserved.
-          </p>
+          <p className="mt-2">© {new Date().getFullYear()} EB5 Paralegal. All rights reserved.</p>
         </div>
       </div>
     </footer>
