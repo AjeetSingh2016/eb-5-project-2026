@@ -2,10 +2,23 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
+    const apiKey = process.env.RESEND_API_KEY;
+    const contactEmail = process.env.CONTACT_EMAIL;
+    const fromEmail = process.env.RESEND_FROM_EMAIL;
+
+    if (!apiKey || !contactEmail || !fromEmail) {
+      console.error("Missing required Resend environment variables.");
+
+      return NextResponse.json(
+        { error: "Email service is not configured." },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
 
     const name =
@@ -34,18 +47,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = process.env.RESEND_API_KEY;
-    const contactEmail = process.env.CONTACT_EMAIL;
-    const fromEmail = process.env.RESEND_FROM_EMAIL;
-
-    if (!apiKey || !contactEmail || !fromEmail) {
-      console.error("Resend environment variables are missing.");
-
-      return NextResponse.json(
-        { error: "Email service is not configured." },
-        { status: 500 }
-      );
-    }
+    const resend = new Resend(apiKey);
 
     const { data, error } = await resend.emails.send({
       from: fromEmail,
