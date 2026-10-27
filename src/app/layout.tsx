@@ -1,10 +1,7 @@
-
 import type { Metadata } from "next";
 import { Manrope, Newsreader } from "next/font/google";
-
 import { Instrument_Serif, Hanken_Grotesk } from "next/font/google";
 import { Fraunces } from "next/font/google";
-
 import { Inter } from "next/font/google";
 
 import "./globals.css";
@@ -21,7 +18,10 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 const display = Instrument_Serif({
   weight: "400",
@@ -35,15 +35,20 @@ const sans = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://eb5paralegal.com"),
+
   title: "EB-5 Paralegal | Your Investors, Our Expertise",
+
   description:
     "Specialist EB-5 paralegal support for immigration law firms. From source of funds analysis to petition preparation, we work as a white-label extension of your legal team.",
+
   openGraph: {
     title: "EB-5 Paralegal | Your Investors, Our Expertise",
     description:
       "Specialist paralegal support for your EB-5 practice. Attorney-controlled workflows, organised documentation, and tailored case preparation.",
     siteName: "EB-5 Paralegal",
     type: "website",
+    url: "https://eb5paralegal.com",
     images: [
       {
         url: "/og-image.png",
@@ -53,6 +58,7 @@ export const metadata: Metadata = {
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
     title: "EB-5 Paralegal | Your Investors, Our Expertise",

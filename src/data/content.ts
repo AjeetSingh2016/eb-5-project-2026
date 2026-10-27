@@ -117,12 +117,12 @@ export const testimonials = [
   {
     quote: "Source of funds files arrived organised, with clear summaries our attorneys could review quickly.",
     name: "Anonymous",
-    place: "Lead immigration paralegal",
+    place: "Principal Attorney",
   },
   {
     quote: "Communication was prompt and professional. We always knew where each matter stood and what came next.",
     name: "Anonymous",
-    place: "Senior case manager",
+    place: "Attorney, California",
   },
 ] as const;
 
