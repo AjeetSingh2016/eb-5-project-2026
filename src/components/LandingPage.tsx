@@ -1127,19 +1127,28 @@ function Testimonials() {
 
 /* ---------------------- CONTACT US ---------------------- */
 
+
+
 function Contact() {
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [status, setStatus] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
   const reduce = useReducedMotion();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (submitting) return;
+
     setSubmitting(true);
     setStatus(null);
 
     const form = e.currentTarget;
     const data = new FormData(form);
-    /* NOTE: "country" was replaced by "firm". Update /api/consult to accept it. */
+
     const payload = {
       name: String(data.get("name") ?? "").trim(),
       email: String(data.get("email") ?? "").trim(),
@@ -1153,11 +1162,24 @@ function Contact() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error();
-      setStatus({ type: "success", message: "Thank you. We will be in touch to schedule an introductory call." });
+
+      if (!res.ok) {
+        throw new Error("Unable to send your message.");
+      }
+
       form.reset();
+
+      setStatus({
+        type: "success",
+        message:
+          "Thank you for contacting EB5 Paralegal. Your inquiry has been received, and our team will be in touch.",
+      });
     } catch {
-      setStatus({ type: "error", message: "We couldn’t send your message. Please try again or email us directly." });
+      setStatus({
+        type: "error",
+        message:
+          "We couldn't send your message. Please try again or email us directly.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -1169,19 +1191,26 @@ function Contact() {
         <SectionHeading
           light
           tag="Contact us"
-          description="Share a sample matter, and we’ll provide a tailored scope of work within 48 hours of review."
+          description="Tell us how we can support your EB-5 practice. Our team will review your inquiry and provide a tailored scope of work within 48 hours."
         >
           Explore how we can support your EB-5 practice
         </SectionHeading>
       </Reveal>
 
       <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-10">
+        {/* Contact information */}
         <Reveal className="h-full">
           <div className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.04] p-6 sm:p-8">
-            <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">How to get started</h3>
+            <h3 className="text-[1.15rem] font-semibold tracking-tight text-white">
+              How to get started
+            </h3>
+
             <ol className="mt-5 space-y-4">
               {contactSteps.map((step, i) => (
-                <li key={step} className="flex gap-3 text-[15px] leading-6 text-white/80">
+                <li
+                  key={step}
+                  className="flex gap-3 text-[15px] leading-6 text-white/80"
+                >
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#d4a853]/15 text-[12px] font-semibold text-[#e3bd6a] ring-1 ring-[#d4a853]/30">
                     {i + 1}
                   </span>
@@ -1189,130 +1218,266 @@ function Contact() {
                 </li>
               ))}
             </ol>
+
             <div className="mt-8 space-y-3 border-t border-white/10 pt-6 text-[14px]">
               <a
                 href={`mailto:${contactEmail}`}
                 className={`flex items-center gap-3 rounded text-white/90 transition hover:text-white ${focusRing}`}
               >
-                <Mail size={16} className="shrink-0 text-[#e3bd6a]" aria-hidden />
+                <Mail
+                  size={16}
+                  className="shrink-0 text-[#e3bd6a]"
+                  aria-hidden="true"
+                />
                 <span className="break-all">{contactEmail}</span>
               </a>
+
               <a
                 href={contactPhoneHref}
                 className={`flex items-center gap-3 rounded text-white/90 transition hover:text-white ${focusRing}`}
               >
-                <Phone size={16} className="shrink-0 text-[#e3bd6a]" aria-hidden />
+                <Phone
+                  size={16}
+                  className="shrink-0 text-[#e3bd6a]"
+                  aria-hidden="true"
+                />
                 {contactPhone}
               </a>
             </div>
           </div>
         </Reveal>
 
+        {/* Contact form or success confirmation */}
         <Reveal delay={0.1}>
-          <form
-            onSubmit={handleSubmit}
-            aria-busy={submitting}
-            className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.5)] backdrop-blur-md sm:p-8"
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="name" className="mb-1.5 block text-[13px] text-white/80">
-                  Full name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  required
-                  autoComplete="name"
-                  maxLength={120}
-                  disabled={submitting}
-                  placeholder="Your name"
-                  className={inputCls}
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="mb-1.5 block text-[13px] text-white/80">
-                  Work email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  maxLength={254}
-                  disabled={submitting}
-                  placeholder="you@yourfirm.com"
-                  className={inputCls}
-                />
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <label htmlFor="firm" className="mb-1.5 block text-[13px] text-white/80">
-                Law firm
-              </label>
-              <input
-                id="firm"
-                name="firm"
-                autoComplete="organization"
-                maxLength={150}
-                disabled={submitting}
-                placeholder="Your firm’s name"
-                className={inputCls}
-              />
-            </div>
-
-            <div className="mt-4">
-              <label htmlFor="message" className="mb-1.5 block text-[13px] text-white/80">
-                How can we help?
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                required
-                minLength={10}
-                maxLength={3000}
-                rows={4}
-                disabled={submitting}
-                placeholder="Tell us about your EB-5 volume or the support you need. Please don’t include client documents."
-                className={`${inputCls} resize-y leading-6`}
-              />
-            </div>
-
-            <div className="mt-6 flex flex-col items-center gap-3">
-              <motion.button
-                whileHover={reduce || submitting ? undefined : { y: -2 }}
-                whileTap={reduce || submitting ? undefined : { scale: 0.98 }}
-                type="submit"
-                disabled={submitting}
-                className={`inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px] font-semibold text-[#041e3f] transition hover:bg-[#eef3f9] disabled:opacity-70 sm:w-auto sm:min-w-[16rem] ${focusRing}`}
+          {status?.type === "success" ? (
+            <motion.div
+              key="success"
+              initial={
+                reduce ? false : { opacity: 0, y: 14, scale: 0.98 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                duration: reduce ? 0 : 0.35,
+                ease: "easeOut",
+              }}
+              role="status"
+              aria-live="polite"
+              className="flex min-h-[420px] flex-col items-center justify-center rounded-3xl border border-[#d4a853]/25 bg-white/[0.05] p-6 text-center shadow-[0_40px_80px_-30px_rgba(0,0,0,0.5)] backdrop-blur-md sm:p-10"
+            >
+              <motion.div
+                initial={
+                  reduce ? false : { scale: 0.75, opacity: 0 }
+                }
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  duration: reduce ? 0 : 0.3,
+                  delay: reduce ? 0 : 0.08,
+                }}
+                className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-[#d4a853]/30 bg-[#d4a853]/10"
               >
-                {submitting ? "Sending…" : "Partner with us"}
-                {!submitting && <ArrowRight size={16} aria-hidden />}
-              </motion.button>
-              <p className="text-center text-[12px] leading-5 text-white/60">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-10 w-10 text-[#e3bd6a]"
+                  aria-hidden="true"
+                >
+                  <path d="m5 12 4 4L19 6" />
+                </svg>
+              </motion.div>
+
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#e3bd6a]">
+                Submission confirmed
+              </p>
+
+              <h3 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                Message sent successfully
+              </h3>
+
+              <p className="mt-4 max-w-sm text-[15px] leading-7 text-white/70">
+                {status.message}
+              </p>
+
+              <div className="mt-7 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] text-white/80">
+                <span
+                  className="h-2 w-2 rounded-full bg-[#d4a853]"
+                  aria-hidden="true"
+                />
+                Thank you for reaching out
+              </div>
+
+              <p className="mt-6 max-w-xs text-[12px] leading-5 text-white/45">
                 Sending this form does not start an engagement.
               </p>
-            </div>
+            </motion.div>
+          ) : (
+            <form
+              key="contact-form"
+              onSubmit={handleSubmit}
+              aria-busy={submitting}
+              className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.5)] backdrop-blur-md sm:p-8"
+            >
+              {/* Name and email: required */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="mb-1.5 block text-[13px] text-white/80"
+                  >
+                    Full name
+                  </label>
 
-            <div aria-live="polite" role="status">
-              {status && (
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    autoComplete="name"
+                    maxLength={120}
+                    disabled={submitting}
+                    placeholder="Your name"
+                    className={inputCls}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="mb-1.5 block text-[13px] text-white/80"
+                  >
+                    Work email
+                  </label>
+
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    maxLength={254}
+                    disabled={submitting}
+                    placeholder="you@yourfirm.com"
+                    className={inputCls}
+                  />
+                </div>
+              </div>
+
+              {/* Law firm: optional */}
+              <div className="mt-4">
+                <label
+                  htmlFor="firm"
+                  className="mb-1.5 block text-[13px] text-white/80"
+                >
+                  Law firm{" "}
+                  <span className="text-white/40">(optional)</span>
+                </label>
+
+                <input
+                  id="firm"
+                  name="firm"
+                  type="text"
+                  autoComplete="organization"
+                  disabled={submitting}
+                  placeholder="Your firm's name"
+                  className={inputCls}
+                />
+              </div>
+
+              {/* Message: optional */}
+              <div className="mt-4">
+                <label
+                  htmlFor="message"
+                  className="mb-1.5 block text-[13px] text-white/80"
+                >
+                  How can we help?{" "}
+                  <span className="text-white/40">(optional)</span>
+                </label>
+
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={4}
+                  disabled={submitting}
+                  placeholder="Tell us briefly what you need help with..."
+                  className={`${inputCls} resize-y leading-6`}
+                />
+
+                <p className="mt-2 text-xs text-white/45">
+                  Please do not include confidential client documents.
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <motion.button
+                  whileHover={
+                    reduce || submitting ? undefined : { y: -2 }
+                  }
+                  whileTap={
+                    reduce || submitting ? undefined : { scale: 0.98 }
+                  }
+                  type="submit"
+                  disabled={submitting}
+                  className={`inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-[14px] font-semibold text-[#041e3f] transition hover:bg-[#eef3f9] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto sm:min-w-[16rem] ${focusRing}`}
+                >
+                  {submitting ? (
+                    <>
+                      <svg
+                        className="h-4 w-4 animate-spin"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          className="opacity-25"
+                        />
+                        <path
+                          d="M21 12a9 9 0 0 0-9-9"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      Sending…
+                    </>
+                  ) : (
+                    <>
+                      Partner with us
+                      <ArrowRight size={16} aria-hidden="true" />
+                    </>
+                  )}
+                </motion.button>
+
+                <p className="text-center text-[12px] leading-5 text-white/60">
+                  Sending this form does not start an engagement.
+                </p>
+              </div>
+
+              {/* Show errors without hiding the form */}
+              {status?.type === "error" && (
                 <p
-                  className={`mt-4 rounded-xl px-4 py-3 text-center text-[14px] ${
-                    status.type === "success" ? "bg-emerald-500/15 text-emerald-100" : "bg-rose-500/15 text-rose-100"
-                  }`}
+                  role="alert"
+                  aria-live="assertive"
+                  className="mt-5 rounded-xl border border-rose-300/15 bg-rose-500/10 px-4 py-3 text-center text-[14px] leading-6 text-rose-100"
                 >
                   {status.message}
                 </p>
               )}
-            </div>
-          </form>
+            </form>
+          )}
         </Reveal>
       </div>
     </Section>
   );
 }
+
 
 /* ---------------------- MOBILE CTA ---------------------- */
 
