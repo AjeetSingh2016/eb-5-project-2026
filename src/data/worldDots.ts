@@ -141,11 +141,7 @@ export const ROUTES: {
   { from: "india", to: "newyork", bend: 0.3 },
   { from: "germany", to: "chicago", bend: 0.3 },
   { from: "argentina", to: "houston", bend: 0.3 },
-  /* Australia flies west: over the Indian Ocean, Africa and the Atlantic, so it stays on the map. */
-  {
-    from: "australia",
-    to: "miami",
-    bend: 0.3,
-    via: [[100, -20], [60, -13], [35, -5], [12, 2], [-15, 10], [-45, 18]],
-  },
+  /* Australia flies west over the Horn of Africa, Sudan and the Sahara, then the Atlantic, as one smooth arc like the others
+     (a lower bend keeps the arc over Africa). */
+  { from: "australia", to: "miami", bend: 0.17 },
 ];

@@ -142,7 +142,7 @@ export const footerLinks = [
 
 export const footerContact = {
   address: "154, Manicktalla Main Road, Kolkata-700054",
-  email: "info@lawyeroncall.in",
+  email: "eb5paralegal@gmail.com",
   phone: "+91-9831366567",
   phoneHref: "tel:+919831366567",
 };
